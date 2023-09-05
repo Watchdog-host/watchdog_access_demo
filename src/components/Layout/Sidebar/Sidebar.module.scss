@@ -1,0 +1,105 @@
+@import 'assets/scss/variables.scss';
+
+.sidebar {
+  padding: 20px 35px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 48px;
+  height: calc(100vh - 20px);
+
+  @media (max-width: $sm) {
+    width: 15%;
+    display: none;
+  }
+
+  .headerLogo {
+    display: flex;
+    align-items: center;
+    img {
+      height: 41px;
+      object-fit: contain;
+    }
+  }
+
+  &Header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &Item {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 12px;
+    cursor: pointer;
+    border-radius: $radiusSm;
+    transition: 0.3s;
+
+    &:nth-child(5) {
+      position: relative;
+      margin-top: 70px;
+
+      &::before {
+        content: '';
+        position: absolute;
+        border-radius: 1px;
+        top: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 55px;
+        height: 1.3px;
+        background-color: #e4e5e6;
+      }
+    }
+
+    &:hover {
+      background-color: $white;
+      box-shadow: $shadowToDown;
+    }
+  }
+
+  &Footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .addButton {
+    width: 56px !important;
+    height: 56px !important;
+    background-color: $dark;
+    border-radius: 7px !important;
+    box-shadow: $shadowToDown;
+
+    &:hover,
+    &:focus {
+      background-color: $blue !important;
+    }
+
+    svg {
+      color: $white;
+    }
+
+    @media (max-width: 900px) {
+      width: 40px !important;
+      height: 40px !important;
+
+      svg {
+        width: 20px;
+      }
+    }
+  }
+}
+
+.linkBox {
+  a {
+    color: inherit;
+  }
+}

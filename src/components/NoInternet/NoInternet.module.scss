@@ -1,0 +1,15 @@
+@import 'assets/scss/variables.scss';
+
+.wrapper {
+  height: 100vh;
+  color: $dark;
+
+  .textBox {
+    b {
+      font-size: 26px;
+    }
+    p {
+      font-size: 18px;
+    }
+  }
+}

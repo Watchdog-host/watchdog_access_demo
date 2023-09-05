@@ -1,0 +1,104 @@
+@import 'assets/scss/variables.scss';
+
+.ant-input-affix-wrapper {
+  width: 100% !important;
+  height: 58px !important;
+  background: #ffffff;
+  border: 2px solid rgba(195, 176, 176, 0.2) !important;
+  border-radius: $radiusSm !important;
+  outline: none !important;
+  padding: 0 20px !important;
+}
+
+.simple-input {
+  width: 100% !important;
+  height: 50px !important;
+  background: #ffffff;
+  border: 2px solid rgba(176, 183, 195, 0.2) !important;
+  border-radius: $radiusSm !important;
+  outline: none !important;
+  padding: 0 20px !important;
+}
+
+.ant-input {
+  font-size: 16px !important;
+  font-weight: 500;
+
+  &::placeholder {
+    font-weight: normal;
+    font-size: 14px;
+  }
+}
+
+.ant-input-lg {
+  height: 54px !important;
+}
+
+.ant-input:focus {
+  color: $dark !important;
+}
+
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused {
+  border: 2px solid rgba(55, 125, 255, 0.2) !important;
+}
+
+.number {
+  color: $blue;
+}
+
+.password {
+  color: $blue;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.search {
+  height: 34px;
+  border: none !important;
+  border-bottom: 1px solid #e2e2e2 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  font-size: 16px;
+  padding-bottom: 10px !important;
+}
+
+//************************************ Input Number styles *************************
+.ant-input-number {
+  width: 100% !important;
+  height: 50px !important;
+  background: #ffffff;
+  border: 1px solid #d9d9d9 !important;
+  border-radius: $radiusSm !important;
+  outline: none !important;
+
+  &:hover,
+  &:active {
+    border: 1px solid #1890ff !important;
+  }
+
+  .ant-input-number-input-wrap {
+    border-radius: $radiusSm !important;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .ant-input-number-handler-wrap {
+    border-top-right-radius: 15px !important;
+    border-bottom-right-radius: 15px !important;
+  }
+}
+
+.ant-input-number-lg {
+  height: 54px !important;
+}

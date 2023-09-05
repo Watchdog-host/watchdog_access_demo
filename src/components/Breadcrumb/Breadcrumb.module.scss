@@ -1,0 +1,29 @@
+@import 'assets/scss/variables.scss';
+
+.breadCrumb {
+  img {
+    height: 45px;
+  }
+  nav ol {
+    align-items: center;
+
+    li {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.text {
+  cursor: pointer;
+  font-size: 16px !important;
+}
+
+.chevronImg {
+  transform: rotate(180deg);
+}
+
+.disabled {
+  color: $darkGray !important;
+  cursor: text;
+}

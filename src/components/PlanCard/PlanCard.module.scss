@@ -1,0 +1,100 @@
+@import 'assets/scss/variables.scss';
+
+.card {
+  background-color: $gray;
+  padding: 20px;
+  border-radius: $radiusSm;
+  position: relative;
+  margin: 8px;
+
+  .subscribeBtn {
+    &.white:hover {
+      color: $dark !important;
+    }
+
+    &.white:focus {
+      color: $dark !important;
+    }
+
+    &:focus {
+      color: white !important;
+    }
+
+    &:hover {
+      color: white !important;
+    }
+  }
+
+  .settings {
+    position: absolute;
+    top: 7%;
+    right: 7%;
+    transform: rotate(90deg);
+    background-color: $gray !important;
+  }
+
+  .title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    display: block !important;
+  }
+
+  .currentPrice {
+    font-size: 16px;
+  }
+
+  .discount {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 0;
+    width: 50px;
+    font-weight: 600;
+    border-radius: $radius;
+    background-color: #ebe4ff;
+    color: $blue;
+  }
+
+  .price {
+    margin-bottom: 1.5rem;
+    margin-top: 10px;
+
+    .amount {
+      line-height: 100%;
+      font-size: 30px;
+    }
+
+    .type {
+      color: $darkGray;
+      font-weight: 300;
+    }
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    li {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      gap: 5px;
+      font-size: 14px;
+
+      .checkIcon {
+        background-color: $green !important;
+        border-radius: $radiusFull;
+        padding: 2px;
+      }
+    }
+  }
+}

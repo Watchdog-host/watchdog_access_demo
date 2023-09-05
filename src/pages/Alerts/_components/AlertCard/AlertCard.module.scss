@@ -1,0 +1,95 @@
+@import 'assets/scss/variables.scss';
+
+.statusBox {
+  background-color: $lightGray;
+  padding: 10px;
+  border-top-left-radius: $radiusSm;
+  border-bottom-left-radius: $radiusSm;
+  box-shadow: $shadowToDownDark;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .devider {
+    margin: 0.6rem 0 !important;
+  }
+}
+
+.content {
+  padding: 1rem 1.5rem;
+  border-top-right-radius: $radiusSm;
+  border-bottom-right-radius: $radiusSm;
+  background-color: black;
+  background-color: $white;
+  box-shadow: $shadowToDownDark;
+
+  img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: $radiusSm;
+  }
+
+  .infoHeader {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .date {
+      font-size: 15px;
+      font-weight: 300;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+
+      &:nth-child(2) {
+        font-weight: lighter;
+      }
+    }
+
+    span {
+      display: flex;
+      align-items: center;
+      font-size: 15px;
+    }
+
+    .confidenceBox {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-weight: 500;
+      font-size: 15px;
+    }
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .infoBox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    p {
+      font-size: 22px;
+      line-height: 100%;
+    }
+
+    span {
+      display: flex;
+      align-items: center;
+    }
+
+    .descriptor {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+  }
+}

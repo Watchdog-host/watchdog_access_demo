@@ -1,0 +1,61 @@
+@import 'assets/scss/variables.scss';
+
+.container {
+  &Box {
+    height: 100%;
+    overflow-y: auto;
+    transition: 1s;
+    padding-right: 16px !important;
+
+    &None {
+      transform: translateX(-100%);
+      overflow-y: hidden;
+    }
+
+    &>div {
+      padding-left: 24px;
+    }
+  }
+
+  &List {
+    width: 100%;
+    margin: auto;
+
+    h4 {
+      margin-bottom: 0 !important;
+    }
+
+    &Item {
+      height: 65px;
+      margin-top: 12px;
+      border-radius: $radius;
+      box-shadow: $shadowToDown;
+      transition: 0.5s;
+      padding: 0 !important;
+
+      & ul {
+        margin-inline-start: 0 !important;
+      }
+
+      &Meta {
+        height: 100%;
+        width: 100%;
+        display: flex !important;
+        align-items: center !important;
+        padding-left: 24px;
+
+        &List {
+          padding-left: 24px;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}
+
+.listDisabled {
+  background-color: #fcfcfd;
+}

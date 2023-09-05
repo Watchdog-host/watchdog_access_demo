@@ -1,0 +1,28 @@
+@import 'assets/scss/variables.scss';
+
+.header {
+  padding: 17px 8px;
+
+  @media (max-width: $sm) {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background-color: $white;
+    padding: 8px;
+  }
+  &Wrapper {
+    height: 48px;
+  }
+
+  &Breadcrumbs {
+    border-radius: $radiusSm;
+    padding: 8px 18px !important;
+    background-color: white;
+  }
+
+  @media (max-width: $sm) {
+    &Organizations {
+      order: 2;
+    }
+  }
+}

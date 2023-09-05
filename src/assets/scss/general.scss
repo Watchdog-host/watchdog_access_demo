@@ -1,0 +1,171 @@
+@import './variables.scss';
+
+//************************************ Badge styles *************************
+.ant-badge-status-dot {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.ant-badge-status-blue {
+  background-color: $blue !important;
+}
+
+.ant-badge-status-processing {
+  background-color: seagreen !important;
+
+  &::after {
+    border-color: seagreen !important;
+  }
+}
+
+//************************************ Segmented styles *************************
+.ant-segmented {
+  background-color: inherit !important;
+
+  .ant-segmented-group {
+    .ant-segmented-item {
+      border-radius: $radiusSm;
+      color: $darkGray;
+    }
+
+    .ant-segmented-item-selected {
+      color: $dark;
+    }
+
+    .ant-segmented-item-label {
+      padding-top: 2px !important;
+      padding-bottom: 2px !important;
+      margin-top: 5px !important;
+    }
+  }
+
+  .ant-segmented-thumb {
+    transition: 0.2s !important;
+    border-radius: 10px !important;
+  }
+}
+
+.ant-popover-inner {
+  border-radius: 10px !important;
+}
+
+//************************************ Dropdown styles *************************
+
+.ant-dropdown-menu {
+  border-radius: 10px !important;
+}
+
+.ant-avatar-lg {
+  width: 50px !important;
+  height: 50px !important;
+}
+
+.ymaps-2-1-29-placemark-overlay {
+  /* 2-1-29 - это только для текущей версии. Поменяется версия, поменяется и класс */
+  -webkit-filter: drop-shadow(0 2px 2px #999);
+  filter: drop-shadow(0 2px 2px #999);
+}
+
+//************************************ Image styles *************************
+.ant-image-mask {
+  border-radius: $radiusSm;
+}
+
+//************************************ Menu styles *************************
+.ant-menu-item {
+  border-radius: 5px;
+  margin-bottom: 0 !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  @media (max-width: $sm) {
+    padding-left: 30px !important;
+  }
+}
+
+.ant-menu-vertical {
+  border: none !important;
+}
+.ant-menu-item-selected {
+  background-color: transparent !important ;
+}
+
+//************************************ Popconfirm styles *************************
+.ant-popconfirm-buttons {
+  display: flex;
+}
+
+.ant-breadcrumb-overlay-link {
+  height: 25px !important;
+}
+
+.ant-popover {
+  // z-index: 100 !important;
+}
+
+//************************************ tabs  in camera modal styles *************************
+
+.camera .ant-tabs-nav {
+  margin: 0 !important;
+}
+
+//************************************ select styles *************************
+.ant-select,
+.ant-select-selector {
+  height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.checkoutNumInput {
+  width: 100%;
+  list-style: 10 !important;
+  border-radius: none !important;
+
+  border-radius: 0 7px 7px 0 !important;
+
+  .ant-input-number-handler-wrap {
+    opacity: 1 !important;
+    width: 50px !important;
+  }
+}
+
+//************************************ range picker styles *************************
+
+.ant-picker-range {
+  margin: 0 !important;
+  height: 50px !important;
+}
+
+.ant-select-selection-item {
+  height: 30px !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  margin: 0 !important;
+}
+.ant-select-selection-overflow {
+  flex-wrap: nowrap !important;
+  gap: 6px;
+}
+//************************************ antd-image styles *************************
+
+.ant-image {
+  overflow: hidden !important;
+  border-radius: $radiusSm;
+}
+
+.ant-image-preview-img{
+  transform: scale(2) !important;
+  border-radius: $radiusSm !important;
+}
+//************************************ double date  picker styles *************************
+
+.ant-picker-panels {
+  @media (max-width: $md) {
+    flex-direction: column !important;
+    width: 15%;
+    display: none;
+  }
+}

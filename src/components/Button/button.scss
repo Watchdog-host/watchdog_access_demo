@@ -1,0 +1,113 @@
+@import 'assets/scss/variables.scss';
+
+.ant-btn {
+  // border: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+  line-height: 15px !important;
+
+  &.full-width {
+    min-width: 100%;
+  }
+
+  &.ant-btn-default {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  &.ant-btn-primary {
+    background-color: $dark !important;
+
+    &:hover,
+    &:active,
+    &:focus {
+      color: white !important;
+      background-color: $blue !important;
+    }
+  }
+
+  &.ant-btn-dangerous {
+    background-color: $red !important;
+    color: $white !important;
+
+    &:hover {
+      color: $white !important;
+    }
+  }
+
+  &.ant-btn-ghost {
+    background: rgba($green, 0.8) !important;
+    color: $white !important;
+
+    &:hover {
+      color: $white !important;
+    }
+  }
+
+  &.ant-btn-add {
+    background-color: rgba(8, 100, 32, 0.1) !important;
+    display: flex;
+    align-items: center;
+    color: $blue !important;
+
+    svg {
+      margin-right: 8px !important;
+    }
+  }
+
+  &.ant-btn-lg {
+    height: 50px;
+  }
+}
+
+.button-onlyIcon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 35px !important;
+  height: 35px !important;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background-color: $lightGray;
+  box-shadow: $shadow !important;
+
+  &:hover {
+    box-shadow: 0 0 10px 5px rgba($darkGray, 0.2) !important;
+    background-color: #f6f6f6;
+  }
+}
+
+.ant-btn:hover,
+.ant-btn:focus {
+  color: inherit !important;
+}
+
+.ant-btn-link {
+  display: flex !important;
+  align-items: center;
+  justify-content: center !important;
+  font-weight: 500 !important;
+  color: $blue !important;
+}
+
+.ant-btn-text {
+  display: flex !important;
+  align-items: center;
+  font-weight: 500 !important;
+
+  svg {
+    margin-right: 5px;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: inherit !important;
+  }
+}
+
+.ant-input-group-addon {
+  padding: 0 !important;
+}

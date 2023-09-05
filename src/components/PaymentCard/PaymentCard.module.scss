@@ -1,0 +1,19 @@
+@import 'assets/scss/variables.scss';
+
+.card {
+  border-radius: $radius;
+  box-shadow: $shadowToDown;
+  padding: 16px;
+  .badge {
+    &.canceled {
+      background-color: $red;
+    }
+    &.paid {
+      background-color: $green;
+    }
+
+    &.panding {
+      background-color: $darkGray;
+    }
+  }
+}

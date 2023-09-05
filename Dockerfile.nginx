@@ -1,0 +1,24 @@
+## base image
+FROM node:alpine as builder
+
+# EDGE PANEL app
+COPY / /data
+WORKDIR /data
+
+# pnpm
+RUN npm install pnpm -g
+RUN pnpm install
+RUN pnpm run build
+
+## runtime image
+FROM nginx:alpine
+
+## update nginx conf with custom config
+RUN rm -rf /etc/nginx/conf.d
+COPY --from=builder /data/nginx.conf /etc/nginx
+
+## copy static files
+COPY --from=builder /data/build /usr/share/nginx/html
+
+## run nginx
+CMD ["nginx", "-g", "daemon off;"]

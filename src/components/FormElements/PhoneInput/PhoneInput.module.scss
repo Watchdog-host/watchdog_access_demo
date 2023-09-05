@@ -1,0 +1,15 @@
+.input {
+  border: none !important;
+  padding-bottom: 10px !important;
+  border-bottom: 1px solid rgba(176, 183, 195, 0.5) !important;
+  background-color: transparent !important;
+  input {
+    background-color: transparent !important;
+    &:focus {
+      box-shadow: none !important;
+      .input {
+        // border-bottom: 1px solid #53b175 !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,54 @@
+@import 'assets/scss/variables.scss';
+
+.contentWrapper {
+  display: grid;
+  grid-template-columns: 118px calc(100% - 118px);
+
+  @media (max-width: $sm) {
+    grid-template-columns: 100%;
+    width: 100%;
+    margin: 0;
+  }
+}
+
+.mainWrapper {
+  display: flex;
+  background-color: $white;
+  border-radius: $radius $radius 0;
+  height: calc(100vh - 82px);
+
+  @media (max-width: $sm) {
+    border-radius: 0;
+  }
+}
+
+.content {
+  width: 50%;
+
+  &.full {
+    width: 100%;
+  }
+
+  &.hide {
+    width: 0;
+    overflow: hidden;
+  }
+}
+
+.map {
+  position: relative;
+  width: 50%;
+  transition: width 0.1s;
+
+  &.full {
+    width: 100%;
+  }
+
+  .mapBtn {
+    position: absolute;
+    z-index: 5;
+    box-shadow: 0 0 10px #ccc !important;
+    top: 100px;
+    left: 0;
+  }
+}

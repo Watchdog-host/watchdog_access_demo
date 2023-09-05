@@ -1,0 +1,95 @@
+@import 'assets/scss/variables.scss';
+
+.dataWrapper {
+  height: calc(100vh - 174px);
+  overflow-y: auto;
+  padding: 20px 20px 0;
+
+  @media (max-width: $sm) {
+    height: 100%;
+  }
+}
+
+.statusBox {
+  margin-bottom: 12px;
+}
+
+.cards {
+  background-color: red;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.card {
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100px;
+  padding-left: 2rem;
+  border-radius: $radiusSm;
+  box-shadow: $shadowToDownDark;
+
+  &Inside {
+    width: 100%;
+  }
+
+  &Info {
+    p {
+      color: $darkGray;
+    }
+
+    h3 {
+      color: $dark;
+      font-size: 24px;
+    }
+
+    &Main {
+      height: 100%;
+      width: 100%;
+    }
+
+    .totalRevenue {
+      color: $green;
+    }
+  }
+
+  &Revenue {
+    p {
+      color: $darkGray;
+    }
+
+    h1 {
+      color: $green;
+    }
+  }
+}
+
+.pagination {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+
+  .paginationBtn {
+    border-radius: $radiusSm;
+    border: none;
+    background-color: $white;
+    outline: none;
+    width: 45px;
+    height: 45px;
+    box-shadow: 0 5px 15px 0 rgb(0 0 0 / 7%);
+    cursor: pointer;
+    transition: 0.2s;
+    &:disabled {
+      background-color: $lightGray;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    &:hover {
+      background-color: $lightGray;
+    }
+  }
+}

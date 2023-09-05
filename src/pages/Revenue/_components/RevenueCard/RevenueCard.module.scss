@@ -1,0 +1,69 @@
+@import 'assets/scss/variables.scss';
+
+.statusBox {
+  background-color: $lightGray;
+  padding: 10px;
+  border-top-left-radius: $radiusSm;
+  border-bottom-left-radius: $radiusSm;
+  box-shadow: $shadowToDownDark;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .devider {
+    margin: 0.6rem 0 !important;
+  }
+}
+
+.content {
+  padding: 1rem 1.5rem;
+  border-top-right-radius: $radiusSm;
+  border-bottom-right-radius: $radiusSm;
+  background-color: black;
+  background-color: $white;
+  box-shadow: $shadowToDownDark;
+  * {
+    line-height: 100%;
+  }
+
+  .img {
+    width: 53px;
+    height: 53px;
+    object-fit: cover;
+    border-radius: $radiusSm;
+  }
+  .date {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 100%;
+    font-weight: lighter;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .infoBox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    p {
+      font-size: 22px;
+      line-height: 120%;
+    }
+  }
+
+  .paid_amount,
+  .elapsed_minutes,
+  .confidence {
+    font-weight: 500;
+    font-size: 18px;
+  }
+}

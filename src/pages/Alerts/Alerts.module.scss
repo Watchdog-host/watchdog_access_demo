@@ -1,0 +1,49 @@
+@import 'assets/scss/variables.scss';
+
+.statusBox {
+  margin-bottom: 12px;
+}
+
+.card {
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100px;
+  padding-left: 2rem;
+  border-radius: $radiusSm;
+  box-shadow: $shadowToDownDark;
+
+  &Inside {
+    width: 100%;
+  }
+  &Info {
+    p {
+      color: $darkGray;
+    }
+
+    h3 {
+      color: $dark;
+      font-size: 24px;
+    }
+
+    &Main {
+      height: 100%;
+      width: 100%;
+
+      h3 {
+        // font-size: 2rem;
+      }
+    }
+  }
+
+  &Revenue {
+    p {
+      color: $darkGray;
+    }
+
+    h1 {
+      color: $green;
+    }
+  }
+}

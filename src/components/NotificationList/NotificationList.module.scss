@@ -1,0 +1,26 @@
+@import 'assets/scss/variables.scss';
+
+.list {
+  border-radius: $radiusSm;
+  // border-bottom: 1px solid black;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $lightGray;
+  }
+
+  &Item {
+    border-radius: $radius;
+    padding: 10px 20px;
+  }
+
+  &Avatar {
+    width: 100px !important;
+    height: 100px !important;
+    border-radius: 10px !important;
+  }
+
+  &Meta {
+    // width: 100%;
+  }
+}

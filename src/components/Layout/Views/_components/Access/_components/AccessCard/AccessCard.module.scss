@@ -1,0 +1,76 @@
+@import 'assets/scss/variables.scss';
+
+.statusBox {
+  background-color: $lightGray;
+  padding: 10px;
+  border-top-left-radius: $radiusSm;
+  border-bottom-left-radius: $radiusSm;
+  box-shadow: $shadowToDownDark;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .devider {
+    margin: 0.6rem 0 !important;
+  }
+}
+
+.content {
+  padding: 1rem;
+  padding-left: 1.5rem;
+  border-top-right-radius: $radiusSm;
+  border-bottom-right-radius: $radiusSm;
+  background-color: black;
+  background-color: $white;
+  box-shadow: $shadowToDownDark;
+  position: relative;
+
+  .img {
+    background-color: red !important;
+    width: 130px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: $radiusSm;
+  }
+
+  .confidenceBox {
+    display: flex;
+    align-items: center;
+    line-height: 100%;
+    gap: 3px;
+    font-weight: 500;
+    font-size: 15px;
+  }
+
+  .infoHeader {
+    p {
+      font-size: 18px;
+      font-weight: lighter;
+
+      &:nth-child(2) {
+        position: relative;
+        right: 22px;
+      }
+    }
+  }
+
+  .descriptor {
+    font-size: 2rem;
+    // max-width: 250px;
+    font-family: 'Nummernschild';
+  }
+
+  .acces_type {
+    font-size: 3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    line-height: 100%;
+  }
+}
+
+.settings {
+  position: absolute;
+  right: 10px;
+  top: 12px;
+  transform: rotate(90deg);
+}

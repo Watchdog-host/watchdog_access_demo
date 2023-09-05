@@ -1,0 +1,30 @@
+@import 'assets/scss/variables.scss';
+
+.dataWrapper {
+  display: block;
+  grid-template-columns: auto;
+
+  &.isAccess {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .devices {
+    height: calc(100vh - 178px);
+    overflow-y: auto;
+    padding: 16px 20px 0;
+  }
+
+  .alerts {
+    height: calc(100vh - 178px);
+    overflow-y: auto;
+    padding: 16px 20px 0;
+    &.isNotAccess {
+      padding: 16px 20px 0 0;
+    }
+  }
+}
+
+.isAccess {
+  padding: 10px 20px 0 20px !important;
+}
