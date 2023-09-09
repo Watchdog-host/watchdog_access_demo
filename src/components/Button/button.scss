@@ -20,6 +20,16 @@
   &.ant-btn-primary {
     background-color: $dark !important;
 
+    &:disabled {
+      opacity: 0.8;
+      color: $white;
+      cursor: not-allowed;
+
+      &:hover {
+        background-color: $dark !important;
+      }
+    }
+
     &:hover,
     &:active,
     &:focus {
@@ -71,8 +81,7 @@
   border: none !important;
   padding: 0 !important;
   border-radius: 50% !important;
-  background-color: $lightGray;
-  box-shadow: $shadow !important;
+  box-shadow: $darkShadowToDown !important;
 
   &:hover {
     box-shadow: 0 0 10px 5px rgba($darkGray, 0.2) !important;

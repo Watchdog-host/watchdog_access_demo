@@ -1,14 +1,18 @@
 @import 'assets/scss/variables.scss';
 
 .statusBox {
-  background-color: $lightGray;
   padding: 10px;
   border-top-left-radius: $radiusSm;
   border-bottom-left-radius: $radiusSm;
-  box-shadow: $shadowToDownDark;
+  box-shadow: $darkShadowToDown;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @media (max-width: $md) {
+    gap: 1rem;
+    padding: 10px;
+  }
 
   .devider {
     margin: 0.6rem 0 !important;
@@ -16,54 +20,176 @@
 }
 
 .content {
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   border-top-right-radius: $radiusSm;
   border-bottom-right-radius: $radiusSm;
   background-color: black;
   background-color: $white;
-  box-shadow: $shadowToDownDark;
+  box-shadow: $darkShadowToDown;
+  gap: 40px;
+  display: flex;
+
+  @media (max-width: $md) {
+    gap: 1rem;
+    justify-content: start;
+    flex-wrap: wrap-reverse;
+  }
+
   * {
+    white-space: nowrap;
     line-height: 100%;
   }
 
+  .item1 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    @media (max-width: $sm) {
+      width: 100%;
+    }
+
+    div {
+      &:nth-child(2) {
+        width: 100%;
+      }
+    }
+  }
   .img {
-    width: 53px;
-    height: 53px;
+    width: 53px !important;
+    height: 53px !important;
     object-fit: cover;
     border-radius: $radiusSm;
   }
-  .date {
-    font-size: 16px;
-    font-weight: 300;
-    line-height: 100%;
-    font-weight: lighter;
-  }
 
-  h2 {
-    font-size: 2rem;
+  .imgIcon {
+    width: 53px;
+    height: 53px;
+    border-radius: $radiusSm;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .title {
     display: flex;
     align-items: center;
     gap: 5px;
+    font-size: 12px;
+
   }
 
   .infoBox {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    align-items: end;
+    position: relative;
+    height: 34px;
+    line-height: 100% !important;
 
-    p {
+    .descriptor {
+      position: absolute;
+      margin-top: 10px;
       font-size: 22px;
-      line-height: 120%;
+      width: 100%;
+      font-family: 'Nummernschild';
+
+      @media (max-width: $md) {
+        margin-top: 0;
+      }
     }
   }
 
+  .paymentBox {
+    display: flex;
+    justify-content: start;
+    gap: 40px;
+    width: 40%;
+
+    @media (max-width: $md) {
+      width: 35%;
+    }
+
+    @media (max-width: $sm) {
+      gap: 16px;
+      width: 30%;
+      justify-content: space-between;
+    }
+  }
+
+  .debt {
+    color: $red;
+  }
+
+  .paid_amount {
+    color: $green;
+  }
+
+  .debt,
   .paid_amount,
   .elapsed_minutes,
   .confidence {
     font-weight: 500;
-    font-size: 18px;
+    font-size: 16px;
+
+    @media (max-width: $sm) {
+      font-size: 15px;
+    }
+  }
+
+  .elapsed_minutesBox {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+
+    .slash {
+      color: $darkGray;
+      font-weight: 500;
+    }
+
+    .iconBox,
+    .priceBox {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+  }
+
+  .dateBox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 !important;
+    position: absolute;
+    top: 18px;
+    right: 40px;
+
+    @media (max-width: $md) {
+      position: relative;
+      right: 0px;
+      top: 0;
+    }
+
+    .date {
+      line-height: 100%;
+      font-weight: lighter;
+    }
+
+    .confidenceBox {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.moreBox {
+  position: absolute;
+  top: 8px;
+  right: 5px;
+
+  @media (max-width: $md) {
+    top: 5px;
   }
 }

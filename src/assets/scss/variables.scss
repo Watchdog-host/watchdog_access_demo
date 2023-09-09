@@ -2,15 +2,14 @@ $dark: #141414;
 $blue: #5754ff;
 $green: #46bea3;
 $white: #ffff;
-
-$lightGray: rgb(252, 252, 253);
-$gray: #fafafa;
+$yellow: #ffcc00;
 $darkGray: #aaa;
 $red: #ff4f37;
+$gray: #fafafa;
 
-$shadow: 0 0px 50px 0 rgb(0 0 0 / 4%);
-$shadowToDown: 0 5px 15px 0 rgb(0 0 0 / 4%);
-$shadowToDownDark: 0 5px 15px 0 rgb(0 0 0 / 4%);
+// $darkShadowToDown: 0 25px 50px -5px rgb(0 0 0 / 8%);
+$darkShadowToDown: 0 25px 30px -5px rgb(0 0 0 / 4%);
+$shadowToDown: 0 25px 50px -10px rgb(0 0 0 / 4%);
 $transition: 0.3s;
 $radiusSm: 7px;
 $radius: 20px;

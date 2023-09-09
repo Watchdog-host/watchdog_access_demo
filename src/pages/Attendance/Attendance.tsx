@@ -9,8 +9,8 @@ type Props = {
 
 const Attendance: FC<Props> = () => {
   return (
-    <div className={`fade container`}>
-      <Row className={'navigation'} align="middle" justify="space-between">
+    <div className={`fade`}>
+      <Row className={'navigation'} align="middle" justify="space-between" wrap={false}>
         <Col>
           <Row align="middle" wrap={false}>
             <Col>
@@ -18,9 +18,7 @@ const Attendance: FC<Props> = () => {
             </Col>
 
             <Col>
-              <span className={'navigationFoundText'}>
-                {[]?.length ? `Found ${[]?.length} Attendances` : 'No found Attendances'}
-              </span>
+              <span className={'navigationFoundText'}>{[]?.length ? `Found ${[]?.length} Attendances` : 'No found Attendances'}</span>
             </Col>
           </Row>
         </Col>

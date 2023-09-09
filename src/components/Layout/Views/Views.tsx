@@ -1,12 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { memo, useEffect, useMemo } from 'react'
 
 import classes from './Views.module.scss'
 import cn from 'classnames'
 import { isCurrentPath } from 'utils'
 import { useLocation } from 'react-router-dom'
-import Map from './_components/Map'
+import Maps from './_components/Maps'
 import Access from './_components/Access'
-
+import { VIEW_TYPE } from 'types'
 export interface IDataMap {
   latitude: number
   longitude: number
@@ -16,32 +16,29 @@ export interface IDataMap {
 }
 
 type Props = {
-  data: IDataMap[]
+  view: VIEW_TYPE
+  setView: (view: VIEW_TYPE) => void
 }
 
-const Views: React.FC<Props> = ({ data }) => {
+const Views: React.FC<Props> = ({ view, setView }) => {
   const isMap = isCurrentPath(['Map'])
   const isAccess = isCurrentPath(['Access'])
-  const [view, setView] = useState(localStorage.getItem('view') || 'Map')
-
   const { pathname } = useLocation()
 
   useEffect(() => {
     if (isMap || isAccess) {
-      localStorage.setItem('view', pathname.slice(1))
-      setView(pathname.slice(1))
+      setView(pathname.slice(1) as VIEW_TYPE)
     }
   }, [pathname])
 
   const content = useMemo(
     () => ({
       Access: <Access />,
-      Map: <Map data={data} />,
+      Map: <Maps />,
     }),
     [pathname],
   )
-
-  return <div className={cn(classes.wrapper, { [classes.isMap]: isMap })}>{content[view as 'Access' | 'Map']}</div>
+  return <div className={cn(classes.wrapper, { [classes.isMap]: isMap })}>{content[view || 'Map']}</div>
 }
 
-export default Views
+export default memo(Views)

@@ -1,14 +1,17 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { API_URL } from 'constants/common'
+import { BASE_URL } from 'constants/common'
 import { IIdentityDTO, QueryFiltersType } from 'types'
 
 export const identityApi = createApi({
   reducerPath: `identity`,
   baseQuery: fetchBaseQuery({
-    baseUrl: API_URL,
+    baseUrl: `${BASE_URL}/v1`,
     prepareHeaders(headers) {
-      const token = localStorage.getItem('token')
-      headers.set('Authorization', `Bearer ${token}`)
+      const profileData = localStorage.getItem('profile')
+      if (profileData !== null) {
+        const profile = JSON.parse(profileData)
+        headers.set('Authorization', `Bearer ${profile.token}`)
+      }
       return headers
     },
   }),
@@ -82,10 +85,4 @@ export const identityApi = createApi({
   }),
 })
 
-export const {
-  useIdentitiesQuery,
-  useIdentityByIdQuery,
-  useAddIdentityMutation,
-  useUpdateIdentityMutation,
-  useDeleteIdentityMutation,
-} = identityApi
+export const { useIdentitiesQuery, useLazyIdentityByIdQuery, useIdentityByIdQuery, useAddIdentityMutation, useUpdateIdentityMutation, useDeleteIdentityMutation } = identityApi

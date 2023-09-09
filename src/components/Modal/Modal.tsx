@@ -9,7 +9,7 @@ type Props = ModalProps & {
 
 const Modal: FC<Props> = ({ width = 600, getContainer = false, children, ...props }) => {
   return (
-    <AntdModal width={width} getContainer={getContainer} footer={null} forceRender {...props}>
+    <AntdModal centered width={width} getContainer={getContainer} footer={null} forceRender {...props}>
       {children}
     </AntdModal>
   )

@@ -3,3 +3,14 @@
 .formWrapper {
   margin-top: 16px;
 }
+.deviceRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  @media (max-width: $md) {
+    height: auto;
+    padding: 0;
+    justify-content: center;
+  }
+}

@@ -1,89 +1,72 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useLocalStorage } from 'react-use'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { useAppSelector } from 'store/hooks'
-import { WsStatusTypes } from 'types'
+import { DEVICE_TYPE, IProfileDTO, WsStatusTypes } from 'types'
+import { replaceProtocolToWs } from 'utils'
 
 type Props = {
-  params: any
-  message: any
+  type: DEVICE_TYPE
+  data: any
 }
-
-const useGetStatusWs = ({ params, message }: Props) => {
+const useGetStatusWs = ({ data, type }: Props) => {
   const [status, setStatus] = useState<WsStatusTypes>()
-  const {
-    navigation: { currentEdge },
-  } = useAppSelector((state) => state)
+  const startTime = useRef(0)
+  const responseTimeout = useRef(0)
+  const width = useRef(data.message.width)
+  const isfirstRender = useRef(true)
+  const { currentEdge } = useAppSelector((state) => state.navigation)
+  const [localProfile] = useLocalStorage<IProfileDTO>('profile')
 
-  const privateIpURL = `ws://${currentEdge?.private_ip}:8080/api/v1/device?params=${JSON.stringify(params)}`
-  const publicIpURL = `ws://${currentEdge?.public_ip}:8080/api/v1/device?params=${JSON.stringify(params)}`
+  const privateSocketUrl = `${replaceProtocolToWs(currentEdge?.private_ip)}/api/v1/device?token="${localProfile?.token}"&params=${JSON.stringify(data.params)}`
+  const publicSocketUrl = `${replaceProtocolToWs(currentEdge?.public_ip)}/api/v1/device?token="${localProfile?.token}"&params=${JSON.stringify(data.params)}`
+  const [socketUrl, setSocketUrl] = useState<string>('')
 
-  const [url, setUrl] = useState<string>(privateIpURL)
-  const [pingInterval, setPingInterval] = useState<number>(40)
-  const [isPinging, setIsPinging] = useState<boolean>(false)
-
-  const { lastJsonMessage, sendMessage, readyState, getWebSocket } = useWebSocket(url, {
+  const { lastJsonMessage, sendJsonMessage, readyState } = useWebSocket(socketUrl || privateSocketUrl, {
     onError: (event) => {
       console.error('WebSocket connection error:', event)
+      setSocketUrl(publicSocketUrl)
     },
+    retryOnError: true,
+    shouldReconnect: () => true,
   })
 
   useEffect(() => {
-    let intervalValue: NodeJS.Timeout
+    setStatus(lastJsonMessage as any)
+    const endTime = Date.now()
+    responseTimeout.current = endTime - startTime.current
+  }, [lastJsonMessage])
 
+  function calcMiddleWidth(pingInterval: number) {
+    const MIN_WIDTH = data.message.width
+    const MAX_WIDTH = 640
+
+    if (responseTimeout.current < pingInterval) return width.current < MAX_WIDTH ? (width.current *= 2) : MAX_WIDTH
+    else return width.current > MIN_WIDTH ? (width.current /= 2) : MIN_WIDTH
+  }
+
+  useEffect(() => {
+    let intervalValue: NodeJS.Timeout
+    let pingInterval = type === 'Camera' ? 1000 / 24 : 5000
     const fetchData = () => {
       if (readyState === ReadyState.OPEN) {
-        sendMessage(JSON.stringify(message))
-        setStatus(lastJsonMessage as WsStatusTypes)
+        startTime.current = Date.now()
+        sendJsonMessage(data.message.width ? { ...data.message, width: calcMiddleWidth(pingInterval) } : data.message)
+        isfirstRender.current = false
       }
     }
-
-    const connectPrivateWebSocket = () => {
-      if (readyState === ReadyState.CONNECTING && url !== privateIpURL) {
-        setUrl(privateIpURL)
-        setPingInterval(40)
-        setIsPinging(false)
-      }
+    if (isfirstRender.current) {
+      fetchData()
     }
 
-    const reconnectWebSocket = () => {
-      if (readyState === ReadyState.CLOSED) {
-        setUrl(publicIpURL)
-        setPingInterval(5000)
-        setIsPinging(true)
-      }
-    }
-
-    const pingWebSocket = () => {
-      if (isPinging) {
-        clearInterval(intervalValue)
-        intervalValue = setInterval(connectPrivateWebSocket, 2000)
-      }
-    }
-
-    intervalValue = setInterval(fetchData, pingInterval)
-    reconnectWebSocket()
-    pingWebSocket()
-
+    intervalValue = setTimeout(fetchData, pingInterval)
     return () => {
-      clearInterval(intervalValue)
+      clearTimeout(intervalValue)
     }
-  }, [
-    currentEdge,
-    readyState,
-    lastJsonMessage,
-    sendMessage,
-    message,
-    url,
-    privateIpURL,
-    publicIpURL,
-    pingInterval,
-    isPinging,
-  ])
+  }, [readyState, lastJsonMessage])
 
   return {
-    status: status?.type,
-    description: status?.description,
-    frame: status?.extra_field ? JSON.parse(status?.extra_field) : null,
+    status,
   }
 }
 

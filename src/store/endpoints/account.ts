@@ -1,14 +1,17 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { API_URL } from 'constants/common'
+import { BASE_URL } from 'constants/common'
 import { IAccountDTO, QueryFiltersType } from 'types'
 
 export const accountApi = createApi({
   reducerPath: `account`,
   baseQuery: fetchBaseQuery({
-    baseUrl: API_URL,
+    baseUrl: `${BASE_URL}/v1`,
     prepareHeaders(headers) {
-      const token = localStorage.getItem('token')
-      headers.set('Authorization', `Bearer ${token}`)
+      const profileData = localStorage.getItem('profile')
+      if (profileData !== null) {
+        const profile = JSON.parse(profileData)
+        headers.set('Authorization', `Bearer ${profile.token}`)
+      }
       return headers
     },
   }),
@@ -44,14 +47,6 @@ export const accountApi = createApi({
         }
       },
       providesTags: ['Accounts'],
-    }),
-
-    profile: builder.query<IAccountDTO, void>({
-      query() {
-        return {
-          url: `/account/profile`,
-        }
-      },
     }),
 
     accountById: builder.query<IAccountDTO, { id?: number }>({
@@ -109,12 +104,4 @@ export const accountApi = createApi({
   }),
 })
 
-export const {
-  useAccountsQuery,
-  useProfileQuery,
-  useAccountByIdQuery,
-  useAddAccountMutation,
-  useUpdateAccountMutation,
-  useUpdateProfileMutation,
-  useDeleteAccountMutation,
-} = accountApi
+export const { useAccountsQuery, useAccountByIdQuery, useAddAccountMutation, useUpdateAccountMutation, useUpdateProfileMutation, useDeleteAccountMutation } = accountApi

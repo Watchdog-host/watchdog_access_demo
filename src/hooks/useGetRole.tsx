@@ -1,15 +1,17 @@
 import { AccountTypeEnum } from 'constants/enums'
-import { useProfileQuery } from 'store/endpoints'
+import { useLocalStorage } from 'react-use'
+import { IProfileDTO } from 'types'
 
 const useGetRole = () => {
-  const { data: profileData } = useProfileQuery()
+  const [localProfile] = useLocalStorage<IProfileDTO>('profile')
 
-  const isOwner = profileData?.type === AccountTypeEnum.Owner
-  const isAdmin = profileData?.type === AccountTypeEnum.Admin
-  const isAgent = profileData?.type === AccountTypeEnum.Agent
-  const isCustomer = profileData?.type === AccountTypeEnum.Customer
-  const isOperator = profileData?.type === AccountTypeEnum.Operator
-  return { isOwner, isAdmin, isAgent, isCustomer, isOperator }
+  const isOwner = localProfile?.type === AccountTypeEnum.Owner
+  const isAdmin = localProfile?.type === AccountTypeEnum.Admin
+  const isAgent = localProfile?.type === AccountTypeEnum.Agent
+  const isCustomer = localProfile?.type === AccountTypeEnum.Customer
+  const isOperator = localProfile?.type === AccountTypeEnum.Operator
+  const isViewer = localProfile?.type === AccountTypeEnum.Viewer
+  return { isOwner, isAdmin, isAgent, isCustomer, isOperator, isViewer }
 }
 
 export default useGetRole

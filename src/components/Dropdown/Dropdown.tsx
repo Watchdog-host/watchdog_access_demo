@@ -26,11 +26,11 @@ const Dropdown: FC<Props> = ({ children, dropdownItems, className, edge_id, setS
   const classNames = cn(className && className, classes.dropdown, disabled && classes.disabled)
   return (
     <AntdDropdown menu={{ items: dropdownItems }} className={classNames} disabled={disabled}>
-      <Row>
+      <Row wrap={false}>
         <span onClick={(e) => setSelectParentId && setSelectParentId(edge_id)}>{children}</span>
         {!disabled && (
           <span className={classes.icon}>
-            <ChevronDown />
+            <ChevronDown size={18} />
           </span>
         )}
       </Row>

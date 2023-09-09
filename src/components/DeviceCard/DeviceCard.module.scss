@@ -1,25 +1,59 @@
 @import 'assets/scss/variables.scss';
 
 .card {
-  width: 100%;
+  width: 300px;
   display: flex;
   flex-direction: column;
   background-color: $white;
   border-radius: $radius;
-  box-shadow: $shadowToDown;
+  box-shadow: $darkShadowToDown;
   position: relative;
 
   .moreBox {
     position: absolute;
-    top: 7%;
-    right: 7%;
-    transform: rotate(90deg);
+    top: 20px;
+    right: 20px;
   }
 
-  .img {
-    width: 100% !important;
-    height: 200px;
-    object-fit: cover !important;
+  .imgBox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 10px 0 10px;
+    border-radius: $radiusSm !important;
+
+    .img {
+      height: 170px;
+      border-radius: $radiusSm !important;
+      object-fit: cover;
+      @media (min-width: $lg) {
+        height: 140px;
+      }
+
+      @media (min-width: $xl) {
+        height: 170px;
+      }
+    }
+  }
+
+  .iconBox {
+    padding: 10px 10px 0 10px;
+    height: 170px;
+    display: flex;
+    align-items: center;
+
+    @media (min-width: $lg) {
+      height: 140px;
+    }
+
+    @media (min-width: $xl) {
+      height: 170px;
+    }
+
+    svg {
+      height: 100% !important;
+    }
   }
 
   h3 {
@@ -31,7 +65,7 @@
     padding: 16px 20px;
 
     .resolutionText {
-      span {
+      div {
         font-weight: 500;
 
         &:last-child {
@@ -39,6 +73,11 @@
           margin-left: 3px;
         }
       }
+    }
+
+    .description {
+      color: $darkGray;
+      width: 100% !important;
     }
 
     h3 {

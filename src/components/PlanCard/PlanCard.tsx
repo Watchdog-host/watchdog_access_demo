@@ -1,12 +1,10 @@
-import { FC, ReactNode, useState } from 'react'
+import { FC, useState } from 'react'
 
 import classes from './PlanCard.module.scss'
 import { IPlanDTO } from 'types'
 import { Col, Menu, Popconfirm, Popover, Row, Typography } from 'antd'
 import Button from 'components/Button'
 import { Check, Dots } from 'tabler-icons-react'
-import { useGetRole } from 'hooks'
-import { toast } from 'react-hot-toast'
 import { PLAN_BTN_COLOR, PLAN_LIST } from 'constants/common'
 import cn from 'classnames'
 import CheckoutModal from 'pages/Plans/_components/CheckoutModal'
@@ -17,7 +15,7 @@ type Props = {
   visible?: boolean
   setSelected: (item?: IPlanDTO) => void
   setVisibleModal: (e: boolean) => void
-  onDelete: Function,
+  onDelete: Function
   role_policy?: boolean
 }
 
@@ -89,13 +87,12 @@ const PlanCard: FC<Props> = ({ data, visible, setSelected, setVisibleModal, onDe
             <Col className={classes.discount}>{data.discount}%</Col>
           </Row>
           <Row className={classes.price} gutter={5} align={'bottom'}>
-            <Col className={classes.amount}>${calculateTotalAmount(data.price, data.discount)} </Col>{' '}
-            <Col className={classes.type}>/month</Col>
+            <Col className={classes.amount}>${calculateTotalAmount(data.price, data.discount)} </Col> <Col className={classes.type}>/month</Col>
           </Row>
         </div>
         <ul>
           {planList.map((text) => (
-            <li>
+            <li key={text}>
               <Check size={15} color="white" className={classes.checkIcon} /> <span>{text}</span>
             </li>
           ))}

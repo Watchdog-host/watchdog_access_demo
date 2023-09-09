@@ -1,9 +1,12 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { Select as AntSelect, SelectProps as AntSelectProps } from 'antd'
 import cn from 'classnames'
 
 import { IGroupOptions } from 'types'
 import './Select.scss'
+import { BoxMultiple, ChevronsDown, ChevronDown } from 'tabler-icons-react'
+import { svgVariables } from 'constants/common'
+import { DefaultOptionType } from 'antd/es/select'
 
 export type SelectProps = AntSelectProps & {
   className?: string
@@ -12,20 +15,10 @@ export type SelectProps = AntSelectProps & {
   size?: string
   navigation?: boolean
   groupOptions?: IGroupOptions[]
+  mode?: 'multiple' | 'tags'
 }
 
-const Select: FC<SelectProps> = ({
-  children,
-  labels,
-  className,
-  fullWidth,
-  options,
-  size,
-  navigation,
-  placeholder = 'Select...',
-  groupOptions,
-  ...props
-}) => {
+const Select: FC<SelectProps> = ({ children, labels, mode, className, fullWidth, options, size, navigation, placeholder = 'Select...', groupOptions, ...props }) => {
   const classNames = cn(className && className, fullWidth && 'full-width', size && size, navigation && 'navigation')
 
   return (
@@ -33,7 +26,8 @@ const Select: FC<SelectProps> = ({
       <AntSelect
         placeholder={placeholder}
         className={classNames}
-        defaultValue={options?.[0]}
+        mode={mode}
+        showArrow={false}
         filterOption={(input: any, option: any) => option.children?.toLowerCase().indexOf(input?.toLowerCase()) >= 0}
         {...props}
       >
@@ -53,6 +47,7 @@ const Select: FC<SelectProps> = ({
               </AntSelect.Option>
             ))}
       </AntSelect>
+      <ChevronDown className="multipleSelectIcon" size={18} color={svgVariables.$darkGray} />
     </div>
   )
 }

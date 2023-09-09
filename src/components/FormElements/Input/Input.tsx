@@ -9,15 +9,7 @@ export type Props = InputProps & {
   isPassword?: boolean
 }
 
-const Input: FC<Props> = ({
-  isSearch,
-  prefix,
-  isPassword,
-  className,
-  placeholder = 'Enter...',
-  bordered = true,
-  ...props
-}) => {
+const Input: FC<Props> = ({ isSearch, prefix, isPassword, className, placeholder = 'Enter...', bordered = true, ...props }) => {
   const { Search, Password } = AntInput
 
   const classNames = cn(className)
@@ -27,16 +19,7 @@ const Input: FC<Props> = ({
   } else if (isPassword) {
     return <Password bordered={bordered} prefix={prefix} className={classNames} {...props} />
   } else {
-    return (
-      <AntInput
-        bordered={bordered}
-        prefix={prefix}
-        className={classNames}
-        placeholder={placeholder}
-        size="small"
-        {...props}
-      />
-    )
+    return <AntInput bordered={bordered} prefix={prefix} className={classNames} placeholder={placeholder} size="small" {...props} />
   }
 }
 

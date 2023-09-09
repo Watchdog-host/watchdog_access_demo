@@ -1,7 +1,7 @@
 import React, { FC, memo, useState } from 'react'
 import _ from 'lodash'
 
-import { Button, Modal } from 'components'
+import { Button, FormElements, Modal } from 'components'
 import { Form, Grid, Row, Col, InputNumber, Select, Typography } from 'antd'
 import { IPlanDTO, durationType } from 'types'
 import classes from './CheckoutModal.module.scss'
@@ -46,15 +46,12 @@ const CheckoutModal: FC<Props> = ({ data, visible, setVisible }) => {
       })
   }
   const selectBefore = (
-    <Select
-      defaultValue="12"
-      value={selectValue}
-      onChange={(type) => setSelectValue(type as durationType)}
-      style={{ width: '100px' }}
-    >
-      <Option value="1">Month</Option>
-      <Option value="12">Year</Option>
-    </Select>
+    <Form.Item name={'date_select'}>
+      <Select value={selectValue} onChange={(type) => setSelectValue(type as durationType)} style={{ width: '100px' }}>
+        <Option value="1">Month</Option>
+        <Option value="12">Year</Option>
+      </Select>
+    </Form.Item>
   )
   return (
     <Modal open={visible} onOk={() => setVisible(false)} onCancel={() => setVisible(false)}>
@@ -63,46 +60,25 @@ const CheckoutModal: FC<Props> = ({ data, visible, setVisible }) => {
         <p>Choose a billing period and finish the upgrade process</p>
       </header>
 
-      <Form onFinish={onFinish} form={form} layout="vertical">
-        <Form.Item>
-          <InputNumber
-            name="asd"
-            className="checkoutNumInput"
-            onKeyDown={onKeyDownValidation}
-            value={count}
-            addonBefore={selectBefore}
-            min={1}
-            defaultValue={1}
-            onChange={(i) => setCount(i)}
-          />
+      <Form onFinish={onFinish} form={form} layout="vertical" initialValues={{ date_select: '12', count: 1 }}>
+        <Form.Item name={'count'}>
+          <FormElements.InputNumber className="checkoutNumInput" onKeyDown={onKeyDownValidation} value={count} addonBefore={selectBefore} min={1} onChange={(i) => setCount(i)} />
         </Form.Item>
         <div className={classes.totalBox}>
           <Row justify={'space-between'}>
             <Col className={classes.title}>Total:</Col>
             <Col className={classes.price}>
               <Row align={'bottom'} gutter={6}>
-                <Col className={classes.price__current}>
-                  ${(data.price * (count * Number(selectValue))).toLocaleString('ru')}
-                </Col>
+                <Col className={classes.price__current}>${(data.price * (count * Number(selectValue))).toLocaleString('ru')}</Col>
                 <Col>/</Col>
-                <Col>
-                  $
-                  {calculateTotalAmount(data.price * (count * Number(selectValue)), data.discount).toLocaleString('ru')}
-                </Col>
+                <Col>${calculateTotalAmount(data.price * (count * Number(selectValue)), data.discount).toLocaleString('ru')}</Col>
               </Row>
             </Col>
           </Row>
         </div>
         <Row justify={'end'} className={classes.btnBox}>
           <Col span={6}>
-            <Button
-              fullWidth
-              type="link"
-              size="large"
-              loading={isLoading}
-              className={classes.cancelBtn}
-              onClick={() => setVisible(false)}
-            >
+            <Button fullWidth type="link" size="large" loading={isLoading} className={classes.cancelBtn} onClick={() => setVisible(false)}>
               Cancel
             </Button>
           </Col>

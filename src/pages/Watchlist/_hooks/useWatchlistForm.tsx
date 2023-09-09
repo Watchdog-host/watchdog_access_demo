@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Col, Form, Row, Tabs, Tag } from 'antd'
+import { Col, Form, Grid, Row, Tag } from 'antd'
 import toast from 'react-hot-toast'
 
 import { useAppSelector } from 'store/hooks'
-import { Button, FormElements } from 'components'
+import { Button, FormElements, Tabs } from 'components'
 import { useAddWatchlistMutation, useUpdateWatchlistMutation } from 'store/endpoints'
 import { useGetRole } from 'hooks'
 import { IWatchlistDTO } from 'types'
 import { X } from 'tabler-icons-react'
+import { logOut, validateMinutes, validatePrice } from 'utils'
+import { valueType } from 'antd/es/statistic/utils'
+import { WatchlistTypeEnum } from 'constants/enums'
 
 export type Props = {
   data?: IWatchlistDTO
@@ -16,19 +19,20 @@ export type Props = {
 }
 
 interface IRate {
-  time: string
-  price: string
+  time: number | null
+  price: number | null
 }
 
-const intialRate = { price: '', time: '' }
+const intialRate = { price: null, time: null }
 
 const useWatchlistForm = ({ data, visible, setVisible }: Props = {}) => {
   const [form] = Form.useForm()
   const [rate, setRate] = useState<IRate>(intialRate)
   const [rateTags, setRateTags] = useState<IRate[]>([])
-
+  const { useBreakpoint } = Grid
+  const { xs } = useBreakpoint()
   const { currentEdge } = useAppSelector((state) => state.navigation)
-  const { isOwner, isAdmin } = useGetRole()
+  const { isOwner, isAdmin, isAgent, isCustomer } = useGetRole()
 
   const [addMutation, { isLoading }] = useAddWatchlistMutation()
   const [updateMutation, { isLoading: updateLoading }] = useUpdateWatchlistMutation()
@@ -38,31 +42,35 @@ const useWatchlistForm = ({ data, visible, setVisible }: Props = {}) => {
       form.resetFields()
       setRate(intialRate)
     }
-  })
+    if (data) {
+      const extra_field = data?.extra_field && JSON.parse(data?.extra_field || {})
+      const arr1: any[] = extra_field?.pricelist?.split(':')?.map((item: string) => item.split('-'))
+      const arr2 = (arr1 || [])?.map((item) => ({
+        time: item[0],
+        price: item[1],
+      }))
+      arr2[0]?.price && arr2[0]?.time && setRateTags(arr2)
 
-  useEffect(() => {
-    form.setFieldsValue({
-      title: data?.title,
-    })
-
-    const arr1: any[] = data?.extra_field?.split(':')?.map((item: string) => item.split('-'))
-
-    const arr2 = (arr1 || [])?.map((item) => ({
-      time: item[0],
-      price: item[1],
-    }))
-    arr2[0]?.price && arr2[0]?.time && setRateTags(arr2)
+      form.setFieldsValue({
+        title: data?.title,
+        penalty: extra_field?.penalty,
+      })
+    }
   }, [data, form, visible])
 
   const onFinish = (values: any) => {
+    const extra_field = JSON.stringify({
+      pricelist: rateTags.map((tag) => `${tag.time}-${tag.price}`).join(':'),
+      penalty: values.penalty ?? undefined,
+    })
     const formData = {
       id: data?.id,
+      type: WatchlistTypeEnum.Timely,
       title: values.title,
       edge_id: currentEdge?.id,
-      extra_field: rateTags.map((tag) => `${tag.time}-${tag.price}`).join(':'),
+      extra_field: extra_field,
     }
-
-    if (isOwner || isAdmin) {
+    if (isOwner || isAdmin || isAgent || isCustomer) {
       if (data) {
         const mutationPromise = updateMutation({
           watchlist_id: data?.id,
@@ -72,7 +80,13 @@ const useWatchlistForm = ({ data, visible, setVisible }: Props = {}) => {
           .promise(mutationPromise, {
             loading: `updating watchlist...`,
             success: `successfully updated`,
-            error: ({ data }) => data?.error,
+            error: (error) => {
+              if (error?.status == 'FETCH_ERROR' || error?.status === 401) {
+                logOut()
+                return error?.error || error?.data?.error
+              }
+              return error?.data?.error
+            },
           })
           .then(() => {
             setVisible?.(false)
@@ -83,7 +97,13 @@ const useWatchlistForm = ({ data, visible, setVisible }: Props = {}) => {
           .promise(mutationPromise, {
             loading: `adding watchlist...`,
             success: `successfully added`,
-            error: ({ data }) => data?.error,
+            error: (error) => {
+              if (error?.status == 'FETCH_ERROR' || error?.status === 401) {
+                logOut()
+                return error?.error || error?.data?.error
+              }
+              return error?.data?.error
+            },
           })
           .then(() => {
             setVisible?.(false)
@@ -96,15 +116,15 @@ const useWatchlistForm = ({ data, visible, setVisible }: Props = {}) => {
     }
   }
 
-  const onChangeInput = (name: string, value: string) => {
+  const onChangeInput = (name: string, value: valueType | null) => {
     setRate((prev) => ({ ...prev, [name]: value }))
   }
 
   const onAddTag = () => {
-    rate.time && rate.price && setRateTags((prev) => [...prev, { time: rate?.time, price: rate?.price }])
+    rate.time !== null && rate.price !== null && setRateTags((prev) => [...prev, { time: rate?.time, price: rate?.price }])
   }
 
-  const onFilterTags = (price: string) => {
+  const onFilterTags = (price: number | null) => {
     setRateTags(() => rateTags.filter((item) => item.price !== price))
   }
 
@@ -127,29 +147,19 @@ const useWatchlistForm = ({ data, visible, setVisible }: Props = {}) => {
             label: 'Price list',
             children: (
               <>
-                <Row gutter={12} align="middle" justify="space-between">
-                  <Col span={10}>
-                    <Form.Item name="time" label="Enter minutes">
-                      <FormElements.Input
-                        size="large"
-                        placeholder="Minute: 10"
-                        value={rate.time}
-                        onChange={(e) => onChangeInput('time', e.target.value)}
-                      />
+                <Row gutter={xs ? 8 : 12} align="top">
+                  <Col span={xs ? 9 : 10}>
+                    <Form.Item name="time" label="Minutes" rules={[{ validator: validateMinutes }]}>
+                      <FormElements.InputNumber min={0} max={525600} size="large" placeholder="e.g., 5" value={rate.time} onChange={(e) => onChangeInput('time', e)} />
                     </Form.Item>
                   </Col>
-                  <Col span={10}>
-                    <Form.Item name="price" label="Enter price">
-                      <FormElements.Input
-                        size="large"
-                        placeholder="Sum: 3 000"
-                        value={rate.price}
-                        onChange={(e) => onChangeInput('price', e.target.value)}
-                      />
+                  <Col span={xs ? 9 : 10}>
+                    <Form.Item name="price" label="Price" rules={[{ validator: validatePrice }]}>
+                      <FormElements.InputNumber min={0} size="large" placeholder="e.g., 3 000" value={rate.price} onChange={(e) => onChangeInput('price', e)} />
                     </Form.Item>
                   </Col>
-                  <Col span={4}>
-                    <Button size="large" type="ghost" fullWidth onClick={onAddTag}>
+                  <Col style={{ marginTop: 28 }} span={xs ? 6 : 4}>
+                    <Button size="large" type="primary" fullWidth onClick={onAddTag}>
                       Add
                     </Button>
                   </Col>
@@ -186,6 +196,11 @@ const useWatchlistForm = ({ data, visible, setVisible }: Props = {}) => {
                     ))}
                   </Row>
                 )}
+                <Col span={24}>
+                  <Form.Item name="penalty" label="Penalty price" rules={[{ validator: validatePrice }]}>
+                    <FormElements.InputNumber min={0} size="large" placeholder="e.g., 0" />
+                  </Form.Item>
+                </Col>
               </>
             ),
           },

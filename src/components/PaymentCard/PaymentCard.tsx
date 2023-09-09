@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react'
+import { FC } from 'react'
 
 import classes from './PaymentCard.module.scss'
 import { IPaymentDTO } from 'types'
@@ -6,7 +6,6 @@ import { Col, Popconfirm, Row } from 'antd'
 import { Trash } from 'tabler-icons-react'
 import { useDeletePaymentMutation } from 'store/endpoints'
 import { toast } from 'react-hot-toast'
-import { useGetRole } from 'hooks'
 import { svgVariables } from 'constants/common'
 import Button from 'components/Button'
 import cn from 'classnames'
@@ -16,7 +15,6 @@ type Props = {
 }
 
 const PaymentCard: FC<Props> = ({ data: { id, plan_title, amount, discount, days, paid_at, canceled_at } }) => {
-  const { isOwner, isAdmin } = useGetRole()
   const [deletePaymentMutation] = useDeletePaymentMutation()
 
   const handleDelete = () => {
@@ -30,8 +28,6 @@ const PaymentCard: FC<Props> = ({ data: { id, plan_title, amount, discount, days
       error: ({ data }) => data?.error,
     })
   }
-
-  console.log(isOwner, isAdmin)
 
   return (
     <Row className={classes.card} justify={'space-between'} align={'middle'}>

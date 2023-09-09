@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from 'react'
+import { FC, ReactNode, useEffect, useState } from 'react'
 
 import { Grid, Row } from 'antd'
 import Col from 'antd/lib/grid/col'
@@ -12,6 +12,7 @@ import { useDeletePlanMutation, usePlansQuery } from 'store/endpoints'
 import { toast } from 'react-hot-toast'
 import { useLocation } from 'react-router-dom'
 import classes from './Plans.module.scss'
+import { logOut } from 'utils'
 type Props = {
   children?: ReactNode
 }
@@ -25,7 +26,7 @@ const Plans: FC<Props> = () => {
   const { xs, md, xxl } = useBreakpoint()
   const { pathname } = useLocation()
 
-  const { data: plansData, isSuccess } = usePlansQuery()
+  const { data: plansData, isSuccess, error } = usePlansQuery()
 
   const [deleteMutation] = useDeletePlanMutation()
   const onDelete = () => {
@@ -36,15 +37,28 @@ const Plans: FC<Props> = () => {
       toast.promise(mutationPromise, {
         loading: `deleting ${pathname.slice(1)}...`,
         success: `successfully delete`,
-        error: ({ data }) => data?.error,
+        error: (error) => {
+          if (error?.status == 'FETCH_ERROR' || error?.status === 401) {
+            logOut()
+            return error?.error || error?.data?.error
+          }
+          return error?.data?.error
+        },
       })
     } else {
       toast.error('Permission denied!')
     }
   }
 
+  useEffect(() => {
+    let status = (error as any)?.status
+    if (status == 'FETCH_ERROR' || status === 401) {
+      logOut()
+    }
+  }, [error])
+
   return (
-    <div className={`fade container`}>
+    <div className={`fade`}>
       <Row className="navigation" align="middle" justify="space-between">
         <Col>
           <Row align="middle" wrap={false}>
@@ -53,9 +67,7 @@ const Plans: FC<Props> = () => {
             </Col>
 
             <Col>
-              <span className={'navigationFoundText'}>
-                {plansData?.length ? `Found ${plansData?.length} Plans` : 'No found Plans'}
-              </span>
+              <span className={'navigationFoundText'}>{plansData?.length ? `Found ${plansData?.length} Plans` : 'No found Plans'}</span>
             </Col>
           </Row>
         </Col>
@@ -63,12 +75,7 @@ const Plans: FC<Props> = () => {
           <Col>
             <Row justify="space-between" align="middle" wrap={false}>
               <Col>
-                <Button
-                  icon={<Plus />}
-                  type="link"
-                  className={'navigationAddButton'}
-                  onClick={() => setAddPlanModal(true)}
-                >
+                <Button icon={<Plus />} type="link" className={'navigationAddButton'} onClick={() => setAddPlanModal(true)}>
                   Add
                 </Button>
               </Col>
@@ -90,7 +97,7 @@ const Plans: FC<Props> = () => {
                   setSelected={setSelectedPlan}
                   setVisibleModal={setUpdatePlanModal}
                   onDelete={onDelete}
-                  role_policy={isOwner||isAdmin}
+                  role_policy={isOwner || isAdmin}
                 />
               </Col>
             ))}
@@ -99,9 +106,7 @@ const Plans: FC<Props> = () => {
           <NoData />
         )}
         {addPlanModal && <AddPlanModal visible={addPlanModal} setVisible={setAddPlanModal} />}
-        {updatePlanModal && (
-          <UpdatePlanModal visible={updatePlanModal} setVisible={setUpdatePlanModal} data={selectedPlan} />
-        )}
+        {updatePlanModal && <UpdatePlanModal visible={updatePlanModal} setVisible={setUpdatePlanModal} data={selectedPlan} />}
       </div>
     </div>
   )

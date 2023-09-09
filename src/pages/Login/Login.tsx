@@ -1,27 +1,30 @@
-import { FC } from 'react'
+import { ChangeEvent, FC, KeyboardEventHandler, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { Col, Form, Row, Checkbox } from 'antd'
 
 import { Button, FormElements } from 'components'
-import { useLoginMutation, useProfileQuery } from 'store/endpoints'
+import { useEdgePathQuery, useLoginMutation } from 'store/endpoints'
 import logo from 'assets/icons/logo-icon.png'
 
 import classes from './Login.module.scss'
+import { toUpperCase } from 'utils'
+import { useLocalStorage } from 'react-use'
 
 type Props = {}
 
 const Login: FC<Props> = () => {
   const [form] = Form.useForm()
-  const [loginMutation, { isLoading: loginLoading }] = useLoginMutation()
+  const [loginMutation, { isLoading: loginLoading, error }] = useLoginMutation({})
   const navigate = useNavigate()
-
-  const { refetch } = useProfileQuery()
+  const [remember, setRemember] = useState(false)
+  const [_, setLocalProfile] = useLocalStorage('profile')
 
   const onFinishLogin = (values: any) => {
     const loginValues = {
       email: values.email,
       password: values.password,
+      remember,
     }
 
     const mutationPromise = loginMutation(loginValues).unwrap()
@@ -30,13 +33,15 @@ const Login: FC<Props> = () => {
       .promise(mutationPromise, {
         loading: `Logging in...`,
         success: `Successfully logged in`,
-        error: ({ data }) => data?.error,
+        error: (error) => {
+          return `${error.status}: ${(error.data?.error, 'Server not responding')}`
+        },
       })
       .then((res) => {
-        localStorage.setItem('token', res.token)
+        setLocalProfile(res)
         navigate('/')
-        refetch()
       })
+      .catch((error) => console.error(error))
   }
 
   return (
@@ -70,7 +75,13 @@ const Login: FC<Props> = () => {
             </Form.Item>
 
             <Form.Item name="password" label="Password" rules={[{ required: true }]}>
-              <FormElements.Input isPassword />
+              <FormElements.Input size="large" isPassword />
+            </Form.Item>
+
+            <Form.Item name="remember">
+              <Checkbox checked={remember} onChange={(e) => setRemember(e.target.checked)}>
+                Remember me
+              </Checkbox>
             </Form.Item>
 
             {/* <Row justify="space-between" className={classes.formFooter}>

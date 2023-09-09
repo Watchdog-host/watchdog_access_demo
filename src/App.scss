@@ -3,10 +3,11 @@
 * {
   margin: 0;
   padding: 0;
+  list-style-type: none !important;
 }
 
 html {
-  height: 100vh;
+  height: 100dvh;
 }
 
 body {
@@ -16,7 +17,6 @@ body {
   display: flex;
   flex-direction: column;
   color: $dark;
-  background-color: $lightGray;
 
   @media (max-width: $sm) {
     background-color: $white;
@@ -32,19 +32,19 @@ body {
     opacity: 100%;
   }
 }
-
-.container {
-  height: 100%;
-  position: relative;
+.pigeon-tiles-box {
+  // filter: grayscale(0.95) !important;
 }
 
 .dataWrapper {
-  height: calc(100vh - 154px);
+  height: calc(100dvh - 157px);
   overflow-y: auto;
   padding: 20px 20px 0;
+  position: relative !important;
 }
 
 .fade {
+  position: relative;
   animation: fade ease-in-out 0.2s;
 }
 
@@ -61,7 +61,7 @@ body {
     border-radius: $radiusSm;
     transition: 0.3s;
     position: relative;
-    box-shadow: $shadowToDown;
+    box-shadow: $darkShadowToDown;
 
     &::before {
       position: absolute;
@@ -110,8 +110,4 @@ body {
 ::-webkit-scrollbar-thumb {
   background: $dark;
   border-radius: $radiusSm;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
 }

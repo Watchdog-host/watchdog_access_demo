@@ -1,0 +1,12 @@
+@import 'assets/scss/variables.scss';
+
+
+.chart {
+  background-color: $white;
+  box-shadow:$shadowToDown;
+  border-radius: $radiusSm;
+  padding: 0 20px 0 17px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 12px;
+}

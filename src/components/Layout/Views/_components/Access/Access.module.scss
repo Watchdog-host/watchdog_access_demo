@@ -3,28 +3,55 @@
 .dataWrapper {
   display: block;
   grid-template-columns: auto;
+  position: relative;
 
   &.isAccess {
     display: grid;
     grid-template-columns: 1fr 1fr;
-  }
 
+    @media (max-width: $md) {
+      grid-template-columns: 1fr;
+    }
+  }
   .devices {
-    height: calc(100vh - 178px);
+    height: calc(100dvh - 157px);
     overflow-y: auto;
-    padding: 16px 20px 0;
+    padding: 20px 20px 0;
+    position: relative;
+
+    @media (max-width: $md) {
+      height: 277px;
+    }
+
+    .deviceRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+
+      @media (max-width: $md) {
+        height: auto;
+        padding: 0;
+        justify-content: center;
+      }
+    }
   }
 
   .alerts {
-    height: calc(100vh - 178px);
+    height: calc(100dvh - 157px);
     overflow-y: auto;
-    padding: 16px 20px 0;
+    padding: 20px 20px 0;
+    position: relative;
+
+    @media (max-width: $md) {
+      height: calc(100dvh - 434px);
+    }
+
     &.isNotAccess {
-      padding: 16px 20px 0 0;
+      padding: 20px 20px 0 0;
     }
   }
 }
 
-.isAccess {
-  padding: 10px 20px 0 20px !important;
+.settingBtn {
+  padding: 0 !important;
 }

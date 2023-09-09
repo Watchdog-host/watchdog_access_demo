@@ -1,14 +1,17 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { API_URL } from 'constants/common'
+import { BASE_URL } from 'constants/common'
 import { IPlanDTO } from 'types'
 
 export const planApi = createApi({
   reducerPath: `plan`,
   baseQuery: fetchBaseQuery({
-    baseUrl: API_URL,
+    baseUrl: `${BASE_URL}/v1`,
     prepareHeaders(headers) {
-      const token = localStorage.getItem('token')
-      headers.set('Authorization', `Bearer ${token}`)
+      const profileData = localStorage.getItem('profile')
+      if (profileData !== null) {
+        const profile = JSON.parse(profileData)
+        headers.set('Authorization', `Bearer ${profile.token}`)
+      }
       return headers
     },
   }),
@@ -70,5 +73,4 @@ export const planApi = createApi({
   }),
 })
 
-export const { usePlansQuery, usePlanByIdQuery, useAddPlanMutation, useUpdatePlanMutation, useDeletePlanMutation } =
-  planApi
+export const { usePlansQuery, usePlanByIdQuery, useAddPlanMutation, useUpdatePlanMutation, useDeletePlanMutation } = planApi

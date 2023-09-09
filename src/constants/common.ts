@@ -16,25 +16,35 @@ import {
   RELAY_TYPE,
   DEVICE_MODEL_TYPE,
   DESCRIPTOR_TYPE,
+  PAYMENT_TYPE,
   PLAN_TYPE,
   PLAN_LIST_TYPE,
   PLAN_BTN_TYPE,
+  BARCODE_FORMATS_TYPE,
+  BARCODE_BINARIZER_TYPE,
+  GRANT_TYPE,
+  EDGE_TYPE,
 } from 'types'
 import { PlanTypeEnum, StatusTypeEnum } from './enums'
-
+import pkgJSON from '../../package.json'
+export const VERSIONS = {
+  ACCESS_WEB: pkgJSON.version,
+}
 const isDev = process.env.NODE_ENV === 'development'
-export const API_URL = isDev ? 'http://192.168.64.10/api/v1' : '/api/v1'
-// export const API_URL = isDev ? 'http://192.168.24.184:8080/api/v1' : '/api/v1'
+
+const BASE_URL = isDev ? 'http://123.456.78.9:8080/api' : `${window.location.origin}/api`
+
+export { BASE_URL }
 
 export const svgVariables = {
   $dark: '#141414',
-  $lightGray: '#fbfbfb',
   $darkGray: '#aaa',
+  $gray: '#fafafa',
   $blue: '#5754ff',
   $white: '#fff',
   $red: '#ff4f37',
   $green: '#46bea3',
-  $yellow: ' #FFCC00',
+  $yellow: '#FFCC00',
 
   xs: 16,
   sm: 20,
@@ -54,48 +64,66 @@ export const ROLE_SELECTS: { label: ROLE_TYPE; value: STATE_NUMBERS }[] = [
 ]
 
 export const GENDER_SELECTS: { label: GENDER_TYPE; value: STATE_NUMBERS }[] = [
-  { label: 'Other', value: 0 },
-  { label: 'Male', value: 1 },
-  { label: 'Female', value: 2 },
+  { label: 'Male', value: 0 },
+  { label: 'Female', value: 1 },
 ]
 
 export const ALERT_SELECTS: { label: ALERT_TYPE; value: STATE_NUMBERS }[] = [
-  { label: 'None', value: 0 },
-  { label: 'Information', value: 1 },
-  { label: 'Warning', value: 2 },
-  { label: 'Critical', value: 3 },
+  { label: 'Information', value: 0 },
+  { label: 'Warning', value: 1 },
+  { label: 'Critical', value: 2 },
 ]
 
-export const ACCESS_SELECTS: { label: ACCESS_TYPE; value: STATE_NUMBERS }[] = [
-  { label: 'Undefined', value: 0 },
-  { label: 'Allow', value: 1 },
-  { label: 'Deny', value: 2 },
+export const GRANT_SELECTS: { label: GRANT_TYPE; value: STATE_NUMBERS }[] = [
+  { label: 'Allow', value: 0 },
+  { label: 'Deny', value: 1 },
 ]
 
-export const DIRECTION_SELECTS: {
-  label: DIRECTION_TYPE
+export const ACCESS_TYPE_SELECTS: {
+  label: ACCESS_TYPE
   value: STATE_NUMBERS
 }[] = [
-  { label: 'Undefined', value: 0 },
-  { label: 'Registration', value: 1 },
-  { label: 'Checkout', value: 2 },
+  { label: 'CheckIn', value: 0 },
+  { label: 'CheckOut', value: 1 },
 ]
 
 export const ENHANCEMENT_SELECTS: {
   label: ENHANCEMENT_TYPE
   value: STATE_NUMBERS
 }[] = [
-  { label: 'None', value: 0 },
-  { label: 'BrightnessAndContrastAuto', value: 1 },
-  { label: 'AINDANE', value: 2 },
-  { label: 'WTHE', value: 3 },
-  { label: 'AGCWD', value: 4 },
-  { label: 'AGCIE', value: 5 },
-  { label: 'IAGCWD', value: 6 },
-  { label: 'CEusingLuminanceAdaptation', value: 7 },
-  { label: 'AdaptiveImageEnhancement', value: 8 },
-  { label: 'JHE', value: 9 },
-  { label: 'SEF', value: 10 },
+  { label: 'BrightnessAndContrastAuto', value: 0 },
+  { label: 'AINDANE', value: 1 },
+  { label: 'WTHE', value: 2 },
+  { label: 'AGCWD', value: 3 },
+  { label: 'AGCIE', value: 4 },
+  { label: 'IAGCWD', value: 5 },
+  { label: 'CEusingLuminanceAdaptation', value: 6 },
+  { label: 'AdaptiveImageEnhancement', value: 7 },
+  { label: 'JHE', value: 8 },
+  { label: 'SEF', value: 9 },
+]
+
+export const BARCODE_FORMATS_SELECTS: {
+  label: BARCODE_FORMATS_TYPE
+  value: BARCODE_FORMATS_TYPE
+}[] = [
+  { label: 'Aztec', value: 'Aztec' },
+  { label: 'Codabar', value: 'Codabar' },
+  { label: 'Code39', value: 'Code39' },
+  { label: 'Code93', value: 'Code93' },
+  { label: 'Code128', value: 'Code128' },
+  { label: 'DataBar', value: 'DataBar' },
+  { label: 'DataBarExpanded', value: 'DataBarExpanded' },
+  { label: 'DataMatrix', value: 'DataMatrix' },
+  { label: 'EAN8', value: 'EAN8' },
+  { label: 'EAN13', value: 'EAN13' },
+  { label: 'ITF', value: 'ITF' },
+  { label: 'MaxiCode', value: 'MaxiCode' },
+  { label: 'PDF417', value: 'PDF417' },
+  { label: 'QRCode', value: 'QRCode' },
+  { label: 'UPCA', value: 'UPCA' },
+  { label: 'UPCE', value: 'UPCE' },
+  { label: 'MicroQRCode', value: 'MicroQRCode' },
 ]
 
 export const DETECTOR_SELECTS: {
@@ -168,20 +196,45 @@ export const RELAY_TYPE_SELECTS: {
   { label: 'Generic', value: 0 },
   { label: 'Barrier', value: 1 },
 ]
-
-// Device model selects
-export const DEVICE_MODEL_SELECTS: {
-  label: DEVICE_MODEL_TYPE
+export const EDGE_TYPE_SELECTS: {
+  label: EDGE_TYPE
   value: STATE_NUMBERS
-}[] = [{ label: 'Router', value: 0 }]
+}[] = [
+  { label: 'Virtual', value: 0 },
+  { label: 'Physical', value: 1 },
+]
 
 export const CAMERA_MODEL_SELECTS: {
   label: DEVICE_MODEL_TYPE
   value: STATE_NUMBERS
 }[] = [
-  { label: 'Router', value: 0 },
+  { label: 'Gateway', value: 0 },
   { label: 'OpenCV', value: 1 },
 ]
+
+export const DEVICES_MODEL_SELECTS: {
+  label: DEVICE_MODEL_TYPE
+  value: STATE_NUMBERS
+}[] = [{ label: 'Gateway', value: 0 }]
+
+export const PRINTER_MODEL_SELECTS: {
+  label: DEVICE_MODEL_TYPE
+  value: STATE_NUMBERS
+}[] = [
+  { label: 'Gateway', value: 0 },
+  { label: 'CUPS', value: 1 },
+]
+
+export const BARCODE_BINARIZER: {
+  label: BARCODE_BINARIZER_TYPE
+  value: STATE_NUMBERS
+}[] = [
+  { label: 'Local avarage', value: 0 },
+  { label: 'Global histogram', value: 1 },
+  { label: 'Fixed threshold', value: 2 },
+  { label: 'Bool cast', value: 3 },
+]
+
 export const DESCRIPTOR_TYPE_SELECT: {
   label: DESCRIPTOR_TYPE
   value: STATE_NUMBERS
@@ -189,6 +242,14 @@ export const DESCRIPTOR_TYPE_SELECT: {
   { label: 'Barcode', value: 0 },
   { label: 'Face', value: 1 },
   { label: 'Plate', value: 2 },
+]
+export const PAYMENT_TYPE_SELECT: {
+  label: PAYMENT_TYPE
+  value: STATE_NUMBERS
+}[] = [
+  { label: 'Cash', value: 0 },
+  { label: 'Card', value: 1 },
+  { label: 'Bank', value: 2 },
 ]
 
 export const PLAN_TYPE_SELECT: {
@@ -209,10 +270,6 @@ export const ROLE_STEPS: Record<number, ROLE_TYPE> = {
   3: 'Customer',
   4: 'Operator',
   5: 'Viewer',
-}
-export const VERSIONS = {
-  PANEL: '0.1.0',
-  GATEWAY_API: '0.1.0',
 }
 export const PLAN_LIST: PLAN_LIST_TYPE = {
   [PlanTypeEnum.Basic]: ['sometext', 'sometext', 'sometext'],

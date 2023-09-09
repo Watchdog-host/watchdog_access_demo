@@ -1,0 +1,32 @@
+@import 'assets/scss/variables.scss';
+
+.filter {
+  &__rangePicker {
+    width: 100%;
+  }
+}
+
+.ant-picker-panel-container {
+  width: 100%;
+  .ant-picker-presets {
+    & + div {
+      width: 120% !important;
+
+      .ant-picker-panels {
+        width: 100% !important;
+
+        .ant-picker-panel {
+          width: 100% !important;
+          justify-content: space-between !important;
+          .ant-picker-datetime-panel {
+            width: 100% !important;
+          }
+
+          .ant-picker-time-panel {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

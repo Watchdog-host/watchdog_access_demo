@@ -1,7 +1,5 @@
 export { default as useGetRole } from './useGetRole'
 export { default as useDeviceStatus } from './useDeviceStatus'
-export { default as useDeviceNavigation } from './useDeviceNavigation'
 export { default as useGetSidebarElements } from './useGetSidebarElements'
-export { default as useDeviceForm } from './useDeviceForm'
 export { default as useGetStatusWs } from './useGetStatusWs'
-export { default as useCountUp } from './useCountUp'
+export { default as useEdgeStatus } from './useEdgeStatus'

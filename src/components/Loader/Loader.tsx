@@ -15,11 +15,7 @@ const Loader: FC<Props> = ({ className, loaderSize = 48, children, ...props }) =
   const classNames = cn(classes.loaderWrapper, className && className)
 
   return (
-    <Spin
-      indicator={<Loader2 style={{ fontSize: loaderSize }} className="rotating" />}
-      className={classNames}
-      {...props}
-    >
+    <Spin indicator={<Loader2 style={{ fontSize: loaderSize }} className="rotating" />} className={classNames} {...props}>
       {children}
     </Spin>
   )

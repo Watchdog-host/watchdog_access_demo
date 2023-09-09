@@ -1,40 +1,43 @@
-// import AccessPage from 'pages/Access'
-import CameraPage from 'pages/Camera'
-import PrinterPage from 'pages/Printer'
-import BarcodeScannerPage from 'pages/BarcodeScanner'
-import LEDMatrixPage from 'pages/LEDMatrix'
-import TriggerPage from 'pages/Trigger'
-import RelayPage from 'pages/Relay'
+import { lazy } from 'react'
 import HomePage from 'pages/Home'
-import AccountsPage from 'pages/Accounts'
-import WatchlistPage from 'pages/Watchlist'
-import PaymentsPage from 'pages/Payments'
-import PlansPage from 'pages/Plans'
-import AlertsPage from 'pages/Alerts'
-import RevenuePage from 'pages/Revenue'
-import AttendancePage from 'pages/Attendance'
-import IdentitiesPage from 'pages/Watchlist/_pages/Identities'
-import SettingsPage from 'pages/Settings'
+import { AccountTypeEnum } from 'constants/enums'
+
+const LazyCameraPage = lazy(() => import('pages/Camera'))
+const LazyPrinterPage = lazy(() => import('pages/Printer'))
+const LazyBarcodeScannerPage = lazy(() => import('pages/BarcodeScanner'))
+const LazyLEDMatrixPage = lazy(() => import('pages/LEDMatrix'))
+const LazyTriggerPage = lazy(() => import('pages/Trigger'))
+const LazyRelayPage = lazy(() => import('pages/Relay'))
+const LazyWatchlistPage = lazy(() => import('pages/Watchlist'))
+const LazyAlertsPage = lazy(() => import('pages/Alerts'))
+const LazyRevenuePage = lazy(() => import('pages/Revenue'))
+const LazyIdentitiesPage = lazy(() => import('pages/Watchlist/_pages/Identities'))
+
+// const LazyAttendancePage = lazy(()=>import('pages/Attendance'))
+// const LazyPlansPage = lazy(()=>import('pages/Plans'))
+// const LazyPaymentsPage = lazy(()=>import('pages/Payments'))
+
+const LazyAccountsPage = lazy(() => import('pages/Accounts'))
+const LazySettingsPage = lazy(() => import('pages/Settings'))
 
 const routes = [
-  { path: `/`, element: <HomePage /> },
-  // { path: `/Access`, element: <AccessPage /> },
-  { path: `/Camera`, element: <CameraPage /> },
-  { path: `/Printer`, element: <PrinterPage /> },
-  { path: `/BarcodeScanner`, element: <BarcodeScannerPage /> },
-  { path: `/LEDMatrix`, element: <LEDMatrixPage /> },
-  { path: `/Trigger`, element: <TriggerPage /> },
-  { path: `/Relay`, element: <RelayPage /> },
-  { path: `/Watchlist`, element: <WatchlistPage /> },
-  { path: `/Watchlist/:id/identities`, element: <IdentitiesPage /> },
-  // { path: `/Alerts`, element: <AlertsPage /> },
-  { path: `/Revenue`, element: <RevenuePage /> },
-  // { path: `/Attendance`, element: <AttendancePage /> },
-  // { path: `/Plans`, element: <PlansPage /> },
-  // { path: `/Payments`, element: <PaymentsPage /> },
-  { path: `/Accounts`, element: <AccountsPage /> },
-  { path: `/Settings`, element: <SettingsPage /> },
-  { path: `*`, element: <SettingsPage /> },
+  { path: `/`, element: <HomePage />, min_role: AccountTypeEnum.Owner },
+  { path: `/Camera`, element: <LazyCameraPage />, min_role: AccountTypeEnum.Operator },
+  { path: `/Printer`, element: <LazyPrinterPage />, min_role: AccountTypeEnum.Operator },
+  { path: `/BarcodeScanner`, element: <LazyBarcodeScannerPage />, min_role: AccountTypeEnum.Operator },
+  { path: `/LEDMatrix`, element: <LazyLEDMatrixPage />, min_role: AccountTypeEnum.Operator },
+  { path: `/Trigger`, element: <LazyTriggerPage />, min_role: AccountTypeEnum.Operator },
+  { path: `/Relay`, element: <LazyRelayPage />, min_role: AccountTypeEnum.Operator },
+  { path: `/Watchlists`, element: <LazyWatchlistPage />, min_role: AccountTypeEnum.Operator },
+  { path: `/Watchlists/:id/identities`, element: <LazyIdentitiesPage />, min_role: AccountTypeEnum.Operator },
+  { path: `/Alerts`, element: <LazyAlertsPage />, min_role: AccountTypeEnum.Customer },
+  { path: `/Revenue`, element: <LazyRevenuePage />, min_role: AccountTypeEnum.Customer },
+  // { path: `/Attendance`, element: <LazyAttendancePage />, min_role: AccountTypeEnum.Customer },
+  // { path: `/Plans`, element: <LazyPlansPage />, min_role: AccountTypeEnum.Viewer },
+  // { path: `/Payments`, element: <LazyPaymentsPage />, min_role: AccountTypeEnum.Viewer },
+  { path: `/Accounts`, element: <LazyAccountsPage />, min_role: AccountTypeEnum.Customer },
+  { path: `/Settings`, element: <LazySettingsPage />, min_role: AccountTypeEnum.Admin },
+  { path: `*`, element: <HomePage />, min_role: AccountTypeEnum.Viewer },
 ]
 
 export default routes

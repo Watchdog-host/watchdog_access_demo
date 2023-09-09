@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useLocalStorage } from 'react-use'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
-import { IAccessDTO } from 'types'
+import { useAppSelector } from 'store/hooks'
+import { IAccessDTO, IProfileDTO } from 'types'
+import { replaceProtocolToWs } from 'utils'
 
 type Props = {
   device_ids: number[]
@@ -10,59 +13,39 @@ type Props = {
 
 const useGetAccessWs = ({ device_ids, verified_only, skip_image }: Props) => {
   const [accessDataWs, setAccessDataWs] = useState<IAccessDTO[]>([])
-  const [retryCount, setRetryCount] = useState(0)
+  const { currentEdge } = useAppSelector((state) => state.navigation)
+  const [localProfile] = useLocalStorage<IProfileDTO>('profile')
 
-  const { lastJsonMessage, readyState } = useWebSocket(
-    `ws://192.168.24.184:8080/api/v1/access?device_ids=${JSON.stringify(
-      device_ids,
-    )}&verified_only=${verified_only}&skip_image=${skip_image}`,
-    {
-      onError: (event) => {
-        console.error('WebSocket connection error:', event)
-      },
-      onReconnectStop: () => {
-        setRetryCount((prevCount) => prevCount + 1)
-        setTimeout(() => {
-          setRetryCount((prevCount) => prevCount + 1)
-        }, 2000)
-      },
+  const privateSocketUrl = `${replaceProtocolToWs(currentEdge?.private_ip)}/api/v1/access?token="${localProfile?.token}"&device_ids=${JSON.stringify(
+    device_ids,
+  )}&verified_only=${verified_only}&skip_image=${skip_image}`
+  const publicSocketUrl = `${replaceProtocolToWs(currentEdge?.public_ip)}/api/v1/access?token="${localProfile?.token}"&device_ids=${JSON.stringify(
+    device_ids,
+  )}&verified_only=${verified_only}&skip_image=${skip_image}`
+  const [socketUrl, setSocketUrl] = useState<string>('')
+
+  const { lastJsonMessage, readyState } = useWebSocket(device_ids.length ? socketUrl || privateSocketUrl : null, {
+    onError: (event) => {
+      console.error('WebSocket connection error:', event)
+      setSocketUrl(publicSocketUrl)
     },
-  )
+    retryOnError: true,
+    shouldReconnect: () => true,
+  })
+
+  useEffect(() => {
+    setAccessDataWs([])
+  }, [currentEdge])
+
   useEffect(() => {
     if (readyState === ReadyState.OPEN && lastJsonMessage) {
       setAccessDataWs((prevItems) => {
-        const updatedItems = [
-          lastJsonMessage as IAccessDTO | any,
-          ...prevItems.filter((item) => item.id !== (lastJsonMessage as IAccessDTO | any).id),
-        ]
-        if (updatedItems.length > 15) {
-          updatedItems.length = 15
-        }
+        const updatedItems = [lastJsonMessage as IAccessDTO | any, ...prevItems.filter((item) => item.id !== (lastJsonMessage as IAccessDTO | any).id)].slice(0, 15)
         return updatedItems
       })
     }
   }, [readyState, lastJsonMessage])
 
-  useEffect(() => {
-    if (readyState === ReadyState.CLOSED) {
-      setRetryCount((prevCount) => prevCount + 1)
-    }
-  }, [readyState, setRetryCount])
-
-  useEffect(() => {
-    if (retryCount > 0) {
-      // Reconnect WebSocket
-      const reconnectTimeout = setTimeout(() => {
-        setRetryCount((prevCount) => prevCount - 1)
-      }, 2000)
-
-      return () => {
-        clearTimeout(reconnectTimeout)
-      }
-    }
-  }, [retryCount, setRetryCount])
-
   return { data: accessDataWs }
 }
-
 export default useGetAccessWs

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Col, Form, Grid, InputNumber, Row } from 'antd'
+import { Col, Form, Grid, Row } from 'antd'
 import { toast } from 'react-hot-toast'
 import _ from 'lodash'
 import { Button, FormElements } from 'components'
@@ -9,6 +9,8 @@ import { PLAN_TYPE_SELECT } from 'constants/common'
 import { IPlanDTO } from 'types'
 import { useGetRole } from 'hooks'
 import classes from '../Plans.module.scss'
+import { PlanTypeEnum } from 'constants/enums'
+import { logOut } from 'utils'
 
 export type Props = {
   data?: IPlanDTO
@@ -41,10 +43,10 @@ const usePlansForm = ({ data, visible, setVisible }: Props = {}) => {
     const formData = {
       id: data?.id,
       title: values.title,
-      type: values.type || 0,
-      price: values.price,
-      discount: values.discount,
-      agent_share: values.agent_share,
+      type: values.type,
+      price: values.price ?? undefined,
+      discount: values.discount ?? undefined,
+      agent_share: values.agent_share ?? undefined,
       edge_id: currentEdge?.id,
     }
 
@@ -58,7 +60,13 @@ const usePlansForm = ({ data, visible, setVisible }: Props = {}) => {
           .promise(mutationPromise, {
             loading: `updating plan...`,
             success: `successfully updated`,
-            error: ({ data }) => data?.error,
+            error: (error) => {
+              if (error?.status == 'FETCH_ERROR' || error?.status === 401) {
+                logOut()
+                return error?.error || error?.data?.error
+              }
+              return error?.data?.error
+            },
           })
           .then(() => {
             setVisible?.(false)
@@ -69,7 +77,13 @@ const usePlansForm = ({ data, visible, setVisible }: Props = {}) => {
           .promise(mutationPromise, {
             loading: `adding plan...`,
             success: `successfully added`,
-            error: ({ data }) => data?.error,
+            error: (error) => {
+              if (error?.status == 'FETCH_ERROR' || error?.status === 401) {
+                logOut()
+                return error?.error || error?.data?.error
+              }
+              return error?.data?.error
+            },
           })
           .then(() => {
             setVisible?.(false)
@@ -80,9 +94,8 @@ const usePlansForm = ({ data, visible, setVisible }: Props = {}) => {
       toast.error('Permission denied!')
     }
   }
-
   return (
-    <Form onFinish={onFinish} form={form} layout="vertical">
+    <Form onFinish={onFinish} form={form} layout="vertical" initialValues={{ type: PLAN_TYPE_SELECT[PlanTypeEnum.Basic].value }}>
       <section className={classes.formWrapper}>
         <Row gutter={12}>
           <Col span={xs ? 24 : 12}>
@@ -99,21 +112,17 @@ const usePlansForm = ({ data, visible, setVisible }: Props = {}) => {
         <Row gutter={12}>
           <Col span={xs ? 24 : 12}>
             <Form.Item name="price" label="Price:" rules={[{ required: true, message: 'price is required' }]}>
-              <InputNumber size="large" placeholder="0" min={0} />
+              <FormElements.InputNumber size="large" placeholder="0" min={0} />
             </Form.Item>
           </Col>
           <Col span={xs ? 12 : 6}>
             <Form.Item name="discount" label="Discount:" rules={[{ required: true, message: 'discount is required' }]}>
-              <InputNumber size="large" placeholder="0" min={0} max={100} />
+              <FormElements.InputNumber size="large" placeholder="0" precision={2} min={0} max={100} float />
             </Form.Item>
           </Col>
           <Col span={xs ? 12 : 6}>
-            <Form.Item
-              name="agent_share"
-              label="Agent share:"
-              rules={[{ required: true, message: 'agent share is required' }]}
-            >
-              <InputNumber size="large" placeholder="0" min={0} max={100} />
+            <Form.Item name="agent_share" label="Agent share:" rules={[{ required: true, message: 'agent share is required' }]}>
+              <FormElements.InputNumber size="large" placeholder="0" precision={2} min={0} max={100} float />
             </Form.Item>
           </Col>
         </Row>

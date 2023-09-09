@@ -1,6 +1,12 @@
 @import 'assets/scss/variables.scss';
 
 //************************************ Form Item styles *************************
+.ant-form-item {
+  @media (max-width: $sm) {
+    margin-bottom: 1rem;
+  }
+}
+
 .ant-form-item-label {
   padding: 0 !important;
 
@@ -35,68 +41,9 @@
 }
 
 //************************************ Checkbox styles *************************
-.ant-checkbox-wrapper {
-  .ant-checkbox-inner {
-    width: 16px;
-    height: 16px;
-    background: rgba(8, 100, 32, 0.05);
-    border: 1px solid rgba(8, 100, 32, 0.1);
-    border-radius: 5px;
-  }
 
-  .ant-checkbox-checked .ant-checkbox-inner::after {
-    left: 25% !important;
-    color: red !important;
-    border-color: #086420;
-  }
-
-  .ant-checkbox + span {
-    position: absolute;
-    left: 100%;
-    bottom: 15%;
-    white-space: nowrap;
-    font-weight: 500;
-    color: $dark;
-  }
-}
-
-.ant-checkbox-group {
-  width: 100%;
-  display: flex !important;
-  justify-content: space-between !important;
-}
-
-.ant-checkbox-inner,
-.ant-checkbox-input {
-  background: rgba(55, 125, 255, 0.05) !important;
-  border: 1px solid rgba(55, 125, 255, 0.2) !important;
-}
-
-.ant-checkbox-checked .ant-checkbox-inner {
-  background-color: rgba(8, 100, 32, 0.05) !important;
-  border: 1px solid rgba(8, 100, 32, 0.1) !important;
-  border-radius: 5px;
-}
-
-.ant-checkbox-checked .ant-checkbox-inner:hover {
-  border-color: #086420 !important;
-}
-
-.ant-checkbox-checked::after,
-.ant-checkbox-input:active,
-.ant-checkbox-input:hover,
-.ant-checkbox-input:focus {
-  border-color: rgba(8, 100, 32, 0.05) !important;
-  border-radius: 5px !important;
-}
-
-.ant-checkbox-wrapper:hover .ant-checkbox-inner,
-.ant-checkbox:hover .ant-checkbox-inner,
-.ant-checkbox-input:focus + .ant-checkbox-inner {
-  border-color: rgba(8, 100, 32, 0.05) !important;
-}
-
-.ant-checkbox-wrapper .ant-checkbox-checked .ant-checkbox-inner::after {
-  width: 5px !important;
-  height: 8px !important;
+.ant-checkbox + span {
+  white-space: nowrap;
+  font-weight: 500;
+  color: $dark;
 }

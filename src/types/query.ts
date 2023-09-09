@@ -4,33 +4,48 @@ import {
   AlertTypeEnum,
   DescriptorTypeEnum,
   DeviceTypeEnum,
+  EdgeStatusEnum,
+  EdgeTypeEnum,
   GrantTypeEnum,
   PaymentTypeEnum,
   PlanTypeEnum,
   StatusTypeEnum,
+  WatchlistTypeEnum,
 } from 'constants/enums'
 import { FILTER_ACTIONS_TYPE, GENDER_TYPE, STATE_NUMBERS } from './common'
 
-export interface LoginRequest {
-  email: string
-  password: string
-}
-
-export interface LoginResponse {
-  token: string
+export interface IEdgeStatus {
+  edge_status: EdgeStatusEnum
+  degraded_devices: number
+  offline_devices: number
+  online_devices: number
+  timestamp: string
+  version: string
+  system_info: {
+    cpu: number
+    cpu_temperature: 71
+    disk: number
+    memory: number
+    swap: number
+    timestamp: string
+  }
 }
 
 export interface IEdgeDTO {
-  children: IEdgeDTO[]
-  enabled: boolean
-  extra_field: any
   id: number
+  type: EdgeTypeEnum
+  title: string
   private_ip: string
   public_ip: string
   latitude: number
   longitude: number
+  extra_field: any
+
   edge_id: number
-  title: string
+
+  children?: IEdgeDTO[]
+  enabled?: boolean
+  status?: IEdgeStatus | null
 }
 
 export interface IAccountDTO {
@@ -40,14 +55,34 @@ export interface IAccountDTO {
   id: number
   title: string
   password: string
-  type: 0 | 1 | 2 | 3 | 4 |5
+  type: AccountTypeEnum
   edges: IEdgeDTO
+  image: string
+}
+export interface IProfileDTO {
+  edge_id: number
+  email: string
+  extra_field: any
+  id: number
+  title: string
+  token: string
+  type: AccountTypeEnum
+  image: string
+}
+
+export interface LoginRequest {
+  email: string
+  password: string
+  remember: boolean
 }
 
 export interface IWatchlistDTO {
-  title: string
   id?: number
+  type: WatchlistTypeEnum
+  title: string
   extra_field?: any
+  image: string
+
   watchlists?: IWatchlistDTO[]
 }
 
@@ -58,29 +93,6 @@ export interface IIdentityDTO {
   birthdate: any
   image: string
   extra_field: any
-}
-
-export interface IDescriptorDTO {
-  id: number
-  type: number
-  data: string
-  extra_field: any
-  identity_id: number
-}
-export interface IDeviceDeviceDTO {
-  id: number
-  extra_field?: any
-  input_device_id: number
-  output_device_id: number
-}
-
-export interface IWatchlistdeviceDTO {
-  id?: number
-  alert_type: number
-  grant_type: number
-  extra_field?: any
-  watchlist_id: number
-  device_id: number
 }
 
 export type IPlanDTO = {
@@ -113,28 +125,30 @@ export interface IPaymentDTO {
 export interface IDeviceDTO {
   id: number
   title: string
-  type: STATE_NUMBERS
-  model: number
-  access_type: number
-  direction: number
-  state: boolean
+  type: DeviceTypeEnum
+  model: DeviceTypeEnum
+  access_type: AccessTypeEnum
   source: string
   latitude: number
   longitude: number
   extra_field?: any
+
+  //question
+  direction: number
+  state: boolean
 }
 
 export interface IAccessDTO {
   id?: number
-  type: AccessTypeEnum
+  type: AccessTypeEnum | null
   time?: string
   descriptor: string
   descriptor_type: DescriptorTypeEnum
   confidence?: number
   verified: boolean
   device_type: DeviceTypeEnum
-  alert_type: AlertTypeEnum
-  grant_type?: GrantTypeEnum
+  alert_type: AlertTypeEnum | null
+  grant_type?: GrantTypeEnum | null
   paid_at?: string | null
   paid_amount?: number | null
   payment_type?: PaymentTypeEnum | null
@@ -143,13 +157,40 @@ export interface IAccessDTO {
   device_title: string
   watchlist_title?: string
   identity_title: string
-  image?: string | null
+  image: string | null
   extra_field?: any
-
   access_id?: number | null
-  access_time?: string
+  watchlist_id?: number | null
   device_id?: number
   identity_id?: number | null
+}
+
+export interface IAccessAlertsDTO {
+  inside_count: number
+  outside_count: number
+  total_count: number
+  information_amount: number
+  warning_amount: number
+  critical_amount: number
+  groups?: {
+    device_id: number
+    information_amount: number
+    warning_amount: number
+    critical_amount: number
+  }[]
+}
+
+export interface IAccessRevenueDTO {
+  inside_count: number
+  outside_count: number
+  total_count: number
+  paid_amount: number
+  debt_amount: number
+  groups: {
+    device_id: number
+    paid_amount: number
+    debt_amount: number
+  }[]
 }
 
 export type QueryFiltersType = {

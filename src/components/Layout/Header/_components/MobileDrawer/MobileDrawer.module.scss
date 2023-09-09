@@ -1,1 +1,78 @@
 @import 'assets/scss/variables.scss';
+
+.logoText {
+  line-height: 100%;
+  font-size: 11px;
+}
+
+.logoSubtext {
+  line-height: 100%;
+  font-size: 20px;
+}
+.version {
+  font-weight: normal;
+  color: $darkGray;
+  position: relative;
+  font-size: 11px;
+  top: 2px;
+}
+.addButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 56px !important;
+  height: 56px !important;
+  background-color: $dark;
+  border-radius: 7px !important;
+  box-shadow: $shadowToDown;
+
+  &:hover,
+  &:focus {
+    background-color: $blue !important;
+  }
+
+  svg {
+    color: $white;
+  }
+
+  @media (max-width: 900px) {
+    width: 40px !important;
+    height: 40px !important;
+
+    svg {
+      width: 20px;
+    }
+  }
+}
+
+footer {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+
+  .sidebarItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.right {
+      margin-left: auto;
+    }
+  }
+}
+.statusWrapper {
+  position: absolute;
+  bottom: 61px;
+  left: 50%;
+  width: 100%;
+  background-color: $white;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  padding: 1rem 0;
+}
+.statusBox {
+  box-shadow: $shadowToDown;
+  border-radius: $radiusSm;
+}

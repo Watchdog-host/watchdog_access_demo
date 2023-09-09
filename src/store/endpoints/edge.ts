@@ -1,40 +1,49 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { API_URL } from 'constants/common'
-import { IEdgeDTO } from 'types'
+import { BASE_URL } from 'constants/common'
+import { IEdgeDTO, IEdgeStatus } from 'types'
 
 export const edgesApi = createApi({
   reducerPath: `edges`,
   keepUnusedDataFor: 0,
   baseQuery: fetchBaseQuery({
-    baseUrl: API_URL,
+    baseUrl: `${BASE_URL}/v1`,
     prepareHeaders(headers) {
-      const token = localStorage.getItem('token')
-      headers.set('Authorization', `Bearer ${token}`)
+      const profileData = localStorage.getItem('profile')
+      if (profileData !== null) {
+        const profile = JSON.parse(profileData)
+        headers.set('Authorization', `Bearer ${profile.token}`)
+      }
       return headers
     },
   }),
-  tagTypes: ['Edges', 'EdgeById'],
-
+  tagTypes: ['Edges', 'EdgeStatus', 'EdgePath', 'EdgeById'],
   endpoints: (builder) => ({
     // queries
-    edges: builder.query<IEdgeDTO[], void>({
+    edgePath: builder.query<IEdgeDTO, void>({
       query() {
         return {
-          url: `/edge`,
+          url: `/edge/path`,
         }
       },
-      providesTags: ['Edges'],
+      providesTags: ['EdgePath'],
     }),
 
-    edgeById: builder.query<IEdgeDTO[], { edge_id?: number }>({
+    edgeById: builder.query<IEdgeDTO, { edge_id: number }>({
       query({ edge_id }) {
         return {
-          url: `/edge/path/${edge_id}`,
+          url: `/edge/${edge_id}`,
         }
       },
-      providesTags: ['Edges', 'EdgeById'],
+      providesTags: ['EdgeById'],
     }),
-
+    edgeStatus: builder.query<IEdgeStatus, void>({
+      query() {
+        return {
+          url: `/edge/status`,
+        }
+      },
+      providesTags: ['EdgeStatus'],
+    }),
     // mutations
     addEdge: builder.mutation<IEdgeDTO, Partial<IEdgeDTO>>({
       query(data) {
@@ -71,5 +80,4 @@ export const edgesApi = createApi({
   }),
 })
 
-export const { useEdgesQuery, useEdgeByIdQuery, useAddEdgeMutation, useUpdateEdgeMutation, useDeleteEdgeMutation } =
-  edgesApi
+export const { useEdgeStatusQuery, useEdgePathQuery, useLazyEdgePathQuery, useAddEdgeMutation, useUpdateEdgeMutation, useDeleteEdgeMutation } = edgesApi

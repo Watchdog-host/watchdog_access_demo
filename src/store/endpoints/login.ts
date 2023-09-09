@@ -1,18 +1,18 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { API_URL } from 'constants/common'
-import { LoginRequest, LoginResponse } from 'types'
+import { BASE_URL } from 'constants/common'
+import { LoginRequest, IProfileDTO } from 'types'
 
 export const loginApi = createApi({
   reducerPath: `login`,
   baseQuery: fetchBaseQuery({
-    baseUrl: API_URL,
+    baseUrl: `${BASE_URL}/v1`,
     prepareHeaders(headers) {
       return headers
     },
   }),
 
   endpoints: (builder) => ({
-    login: builder.mutation<LoginResponse, LoginRequest>({
+    login: builder.mutation<IProfileDTO, LoginRequest>({
       query(data) {
         return {
           url: `/account/login`,
@@ -23,5 +23,4 @@ export const loginApi = createApi({
     }),
   }),
 })
-
 export const { useLoginMutation } = loginApi

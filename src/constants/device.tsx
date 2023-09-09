@@ -1,4 +1,17 @@
-import { AlertTriangle, CameraOff, PrinterOff, Scan, ScreenShareOff } from 'tabler-icons-react'
+import {
+  Barcode,
+  BarcodeOff,
+  CameraOff,
+  DeviceTv,
+  DeviceTvOff,
+  Printer,
+  PrinterOff,
+  Target,
+  TargetOff,
+  CircuitSwitchOpen,
+  CircuitSwitchClosed,
+  CircuitBulb,
+} from 'tabler-icons-react'
 import { svgVariables } from './common'
 
 export const device_states = {
@@ -8,8 +21,8 @@ export const device_states = {
     },
     degraded: {
       icon: (
-        <AlertTriangle
-          color={svgVariables.$yellow}
+        <CameraOff
+          color={svgVariables.$darkGray}
           style={{
             width: '100%',
             height: '80%',
@@ -31,12 +44,20 @@ export const device_states = {
   },
   Printer: {
     online: {
-      icon: 'printer',
+      icon: (
+        <Printer
+          color={svgVariables.$darkGray}
+          style={{
+            width: '100%',
+            height: '80%',
+          }}
+        />
+      ),
     },
     degraded: {
       icon: (
-        <AlertTriangle
-          color={svgVariables.$yellow}
+        <PrinterOff
+          color={svgVariables.$darkGray}
           style={{
             width: '100%',
             height: '80%',
@@ -58,12 +79,21 @@ export const device_states = {
   },
   BarcodeScanner: {
     online: {
-      icon: 'scanner',
+      icon: (
+        <Barcode
+          color={svgVariables.$darkGray}
+          style={{
+            width: '100%',
+            height: '80%',
+          }}
+        />
+      ),
     },
     degraded: {
       icon: (
-        <AlertTriangle
-          color={svgVariables.$yellow}
+        <BarcodeOff
+          className="deviceOffline"
+          color={svgVariables.$darkGray}
           style={{
             width: '100%',
             height: '80%',
@@ -73,7 +103,8 @@ export const device_states = {
     },
     offline: {
       icon: (
-        <Scan
+        <BarcodeOff
+          className="deviceOffline"
           color={svgVariables.$darkGray}
           style={{
             width: '100%',
@@ -85,12 +116,20 @@ export const device_states = {
   },
   LEDMatrix: {
     online: {
-      icon: 'display',
+      icon: (
+        <DeviceTv
+          color={svgVariables.$darkGray}
+          style={{
+            width: '100%',
+            height: '80%',
+          }}
+        />
+      ),
     },
     degraded: {
       icon: (
-        <AlertTriangle
-          color={svgVariables.$yellow}
+        <DeviceTvOff
+          color={svgVariables.$darkGray}
           style={{
             width: '100%',
             height: '80%',
@@ -100,7 +139,7 @@ export const device_states = {
     },
     offline: {
       icon: (
-        <ScreenShareOff
+        <DeviceTvOff
           color={svgVariables.$darkGray}
           style={{
             width: '100%',
@@ -112,12 +151,20 @@ export const device_states = {
   },
   Trigger: {
     online: {
-      icon: 'trigger',
+      icon: (
+        <Target
+          color={svgVariables.$darkGray}
+          style={{
+            width: '100%',
+            height: '80%',
+          }}
+        />
+      ),
     },
     degraded: {
       icon: (
-        <AlertTriangle
-          color={svgVariables.$yellow}
+        <TargetOff
+          color={svgVariables.$darkGray}
           style={{
             width: '100%',
             height: '80%',
@@ -127,7 +174,7 @@ export const device_states = {
     },
     offline: {
       icon: (
-        <CameraOff
+        <TargetOff
           color={svgVariables.$darkGray}
           style={{
             width: '100%',
@@ -139,12 +186,20 @@ export const device_states = {
   },
   Relay: {
     online: {
-      icon: 'relay',
+      icon: (
+        <CircuitSwitchOpen
+          color={svgVariables.$darkGray}
+          style={{
+            width: '100%',
+            height: '80%',
+          }}
+        />
+      ),
     },
     degraded: {
       icon: (
-        <AlertTriangle
-          color={svgVariables.$yellow}
+        <CircuitSwitchClosed
+          color={svgVariables.$darkGray}
           style={{
             width: '100%',
             height: '80%',
@@ -154,7 +209,7 @@ export const device_states = {
     },
     offline: {
       icon: (
-        <CameraOff
+        <CircuitBulb
           color={svgVariables.$darkGray}
           style={{
             width: '100%',

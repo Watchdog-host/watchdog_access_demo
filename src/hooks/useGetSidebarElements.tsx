@@ -24,6 +24,8 @@ import { svgVariables } from 'constants/common'
 import { isCurrentPath } from 'utils'
 import cn from 'classnames'
 import { SIDEBAR_LINK_TYPE } from 'types'
+import useGetRole from './useGetRole'
+import { AccountTypeEnum } from 'constants/enums'
 const useGetSidebarElements = () => {
   const navigate = useNavigate()
   const { pathname } = useLocation()
@@ -44,9 +46,7 @@ const useGetSidebarElements = () => {
       Relay: <CircuitSwitchOpen color={isCurrentPath(['Relay']) ? svgVariables.$dark : svgVariables.$darkGray} />,
       Alerts: <AlertTriangle color={isCurrentPath(['Alerts']) ? svgVariables.$dark : svgVariables.$darkGray} />,
       Revenue: <ChartInfographic color={isCurrentPath(['Revenue']) ? svgVariables.$dark : svgVariables.$darkGray} />,
-      Attendance: (
-        <BrandDaysCounter color={isCurrentPath(['Attendance']) ? svgVariables.$dark : svgVariables.$darkGray} />
-      ),
+      Attendance: <BrandDaysCounter color={isCurrentPath(['Attendance']) ? svgVariables.$dark : svgVariables.$darkGray} />,
       Plans: <ShoppingCartDiscount color={isCurrentPath(['Plans']) ? svgVariables.$dark : svgVariables.$darkGray} />,
       Payments: <Wallet color={isCurrentPath(['Payments']) ? svgVariables.$dark : svgVariables.$darkGray} />,
     }
@@ -54,7 +54,7 @@ const useGetSidebarElements = () => {
       key: link,
       label: (
         <div className={cn('innerSidebarLink', { active: isCurrentPath([link]) })}>
-          {sidebarTypeIcons[link as SIDEBAR_LINK_TYPE]} <span>{link}</span>{' '}
+          {sidebarTypeIcons[link as SIDEBAR_LINK_TYPE]} <span>{link}</span>
         </div>
       ),
       onClick: () => pushPathname(`/${link}`),
@@ -62,8 +62,8 @@ const useGetSidebarElements = () => {
   }
   const menuItems = [
     {
-      content: 'Access',
-      key: 'Access',
+      content: 'Views',
+      key: 'Views',
       link: '/Access',
       icon: (
         <div className={cn('sidebarLink', { active: isCurrentPath(['Access', 'Map']) })}>
@@ -71,10 +71,11 @@ const useGetSidebarElements = () => {
         </div>
       ),
       items: renderSubmenuItems(['Access', 'Map']),
+      min_role: AccountTypeEnum.Viewer,
     },
     {
-      content: 'Camera',
-      key: 'Camera',
+      content: 'Devices',
+      key: 'Devices',
       link: '/Camera',
       icon: (
         <div
@@ -82,44 +83,39 @@ const useGetSidebarElements = () => {
             active: isCurrentPath(['Camera', 'Printer', 'BarcodeScanner', 'LEDMatrix', 'Trigger', 'Relay']),
           })}
         >
-          <Cpu
-            color={
-              isCurrentPath(['Camera', 'Printer', 'BarcodeScanner', 'LEDMatrix', 'Trigger', 'Relay'])
-                ? svgVariables.$dark
-                : svgVariables.$darkGray
-            }
-          />
+          <Cpu color={isCurrentPath(['Camera', 'Printer', 'BarcodeScanner', 'LEDMatrix', 'Trigger', 'Relay']) ? svgVariables.$dark : svgVariables.$darkGray} />
         </div>
       ),
       style: { color: 'red' },
       items: renderSubmenuItems(['Camera', 'Printer', 'BarcodeScanner', 'LEDMatrix', 'Trigger', 'Relay']),
+      min_role: AccountTypeEnum.Operator,
     },
     {
-      content: 'Watchlist',
-      key: 'Watchlist',
-      link: '/Watchlist',
+      content: 'Watchlists',
+      key: 'Watchlists',
+      link: '/Watchlists',
       icon: (
-        <div className={cn('sidebarLink', { active: isCurrentPath(['Watchlist']) || pathname.includes('identities') })}>
-          <ClipboardList color={(isCurrentPath(['Watchlist']) || pathname.includes('identities')) ? svgVariables.$dark : svgVariables.$darkGray} />
+        <div className={cn('sidebarLink', { active: isCurrentPath(['Watchlists']) || pathname.includes('identities') })}>
+          <ClipboardList color={isCurrentPath(['Watchlists']) || pathname.includes('identities') ? svgVariables.$dark : svgVariables.$darkGray} />
         </div>
       ),
+      min_role: AccountTypeEnum.Operator,
     },
     {
-      content: 'Revenue',
-      key: 'Revenue',
-      link: '/Revenue',
+      content: 'Reports',
+      key: 'Reports',
+      link: '/Alerts',
       icon: (
         <div className={cn('sidebarLink', { active: isCurrentPath(['Alerts', 'Revenue', 'Attendance']) })}>
-          <ChartBar
-            color={isCurrentPath(['Alerts', 'Revenue', 'Attendance']) ? svgVariables.$dark : svgVariables.$darkGray}
-          />
+          <ChartBar color={isCurrentPath(['Alerts', 'Revenue', 'Attendance']) ? svgVariables.$dark : svgVariables.$darkGray} />
         </div>
       ),
       items: renderSubmenuItems([
-        // 'Alerts',
+        'Alerts',
         'Revenue',
         //, 'Attendance'
       ]),
+      min_role: AccountTypeEnum.Customer,
     },
     // {
     //   content: 'Plans',
@@ -131,6 +127,7 @@ const useGetSidebarElements = () => {
     //     </div>
     //   ),
     //   items: renderSubmenuItems(['Plans', 'Payments']),
+    //   min_role: AccountTypeEnum.Viewer
     // },
     {
       content: 'Accounts',
@@ -141,6 +138,7 @@ const useGetSidebarElements = () => {
           <Users color={isCurrentPath(['Accounts']) ? svgVariables.$dark : svgVariables.$darkGray} />
         </div>
       ),
+      min_role: AccountTypeEnum.Customer,
     },
   ]
 

@@ -2,36 +2,15 @@
 
 .ant-breadcrumb-overlay-link {
   cursor: pointer;
+  margin: 0 36px 0 0 !important;
 }
 
 .ant-breadcrumb-link {
   font-weight: 500;
+  margin: 0 18px;
 
-  a span {
-    color: $blue;
-  }
-
-  span {
-    color: #505050;
-  }
-}
-
-.ant-breadcrumb-separator {
-  display: flex;
-  align-items: center;
-  color: rgba($darkGray, 0.3) !important;
-  user-select: none !important;
-}
-.ant-breadcrumb-overlay-link:hover {
-  background-color: transparent !important;
-}
-.ant-breadcrumb-overlay-link {
-  svg {
-    transition: 0.7s;
-  }
-  &:hover {
-    svg {
-      transform: rotateX(180deg);
-    }
+  @media (max-width: $sm) {
+    font-size: 14px !important;
+    padding: 0 5px;
   }
 }

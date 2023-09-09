@@ -1,28 +1,45 @@
 @import 'assets/scss/variables.scss';
 
 .header {
-  padding: 17px 8px;
+  padding: 17px 8px 17px 0;
 
+  .infoBox {
+    display: flex;
+    align-items: center;
+
+    @media (max-width: $sm) {
+      gap: 8px;
+    }
+  }
+
+  .headerInfo {
+    padding-right: 10px;
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+  }
   @media (max-width: $sm) {
     position: sticky;
     top: 0;
     z-index: 30;
-    background-color: $white;
     padding: 8px;
   }
+
   &Wrapper {
     height: 48px;
   }
-
-  &Breadcrumbs {
-    border-radius: $radiusSm;
-    padding: 8px 18px !important;
-    background-color: white;
-  }
-
   @media (max-width: $sm) {
     &Organizations {
       order: 2;
     }
+  }
+}
+
+.headerDrawerBox {
+  button {
+    // background-color: $gray;
   }
 }

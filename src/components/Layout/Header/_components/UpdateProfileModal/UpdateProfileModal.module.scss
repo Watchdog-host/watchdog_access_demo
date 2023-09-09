@@ -1,0 +1,10 @@
+.avatarBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  .avatar {
+    border-radius: 10px;
+    width: 100px !important;
+    height: 100px;
+  }
+}

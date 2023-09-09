@@ -1,14 +1,29 @@
 @import 'assets/scss/variables.scss';
 
+.accessCard {
+  @media (max-width: $md) {
+    margin: 0 !important;
+  }
+
+  * {
+    line-height: 100% !important;
+  }
+}
+
+@import 'assets/scss/variables.scss';
+
 .statusBox {
-  background-color: $lightGray;
   padding: 10px;
   border-top-left-radius: $radiusSm;
   border-bottom-left-radius: $radiusSm;
-  box-shadow: $shadowToDownDark;
+  box-shadow: $darkShadowToDown;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+
+  @media (max-width: $sm) {
+    padding: 7px;
+  }
 
   .devider {
     margin: 0.6rem 0 !important;
@@ -17,60 +32,205 @@
 
 .content {
   padding: 1rem;
-  padding-left: 1.5rem;
   border-top-right-radius: $radiusSm;
   border-bottom-right-radius: $radiusSm;
   background-color: black;
   background-color: $white;
-  box-shadow: $shadowToDownDark;
-  position: relative;
+  box-shadow: $darkShadowToDown;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
 
-  .img {
-    background-color: red !important;
-    width: 130px;
-    height: 130px;
-    object-fit: cover;
-    border-radius: $radiusSm;
+  @media (max-width: $sm) {
+    gap: 1rem;
+    padding: 10px;
+    justify-content: start;
+    flex-wrap: wrap-reverse;
   }
 
-  .confidenceBox {
+  * {
+    white-space: nowrap;
+    line-height: 100%;
+  }
+
+  .item1 {
     display: flex;
     align-items: center;
-    line-height: 100%;
-    gap: 3px;
-    font-weight: 500;
-    font-size: 15px;
-  }
+    gap: 1rem;
+    width: 100%;
 
-  .infoHeader {
-    p {
-      font-size: 18px;
-      font-weight: lighter;
+    @media (max-width: $sm) {
+    }
 
+    div {
       &:nth-child(2) {
-        position: relative;
-        right: 22px;
+        width: 100%;
+      }
+    }
+
+    .img {
+      width: 120px !important;
+      height: 120px !important;
+      object-fit: cover;
+      border-radius: $radiusSm;
+
+      @media (max-width: $sm) {
+        width: 100px !important;
+        height: 100px !important;
+      }
+
+      @media (max-width: $xs) {
+        width: 80px !important;
+        height: 80px !important;
+      }
+    }
+
+    .imgIcon {
+      width: 120px;
+      height: 120px;
+
+      svg {
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      @media (max-width: $sm) {
+        width: 100px;
+        height: 100px;
+      }
+
+      @media (max-width: $xs) {
+        width: 80px;
+        height: 80px;
+      }
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+    }
+
+    .infoBox {
+      display: flex;
+      align-items: center;
+      position: relative;
+      height: 40px;
+      @media (max-width: $sm) {
+        height: 30px;
+      }
+
+      .identity {
+        font-size: 28px;
+      }
+
+      .descriptor {
+        margin-top: 10px;
+        font-size: 28px;
+        position: absolute;
+        width: 99%;
+        font-family: 'Nummernschild';
+
+        @media (max-width: $sm) {
+          margin-top: 0;
+          font-size: 25px;
+        }
       }
     }
   }
 
-  .descriptor {
-    font-size: 2rem;
-    // max-width: 250px;
-    font-family: 'Nummernschild';
-  }
+  .dateBox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 !important;
+    position: absolute;
+    right: 60px;
+    top: 17px;
+    font-size: 17px;
 
-  .acces_type {
-    font-size: 3rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    line-height: 100%;
+    @media (max-width: $sm) {
+      right: 0px;
+      top: 0;
+      position: relative;
+    }
+
+    .date {
+      line-height: 100%;
+      font-weight: 500;
+    }
+
+    .confidenceBox {
+      display: flex;
+      align-items: center;
+
+      p {
+        font-weight: 500;
+      }
+    }
   }
 }
 
-.settings {
+.moreBox {
   position: absolute;
+  top: 8px;
   right: 10px;
-  top: 12px;
-  transform: rotate(90deg);
+
+  @media (max-width: $sm) {
+    top: 0px;
+    right: 5px;
+  }
+}
+
+.alertRow {
+  display: flex;
+  align-items: center;
+}
+
+.alertTitle {
+  line-height: 100%;
+  font-size: 55px;
+  font-weight: 600;
+
+  @media (max-width: $sm) {
+    font-size: 35px;
+  }
+}
+.slash {
+  position: relative;
+  margin-right: 30px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: -17px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 30px;
+    background-color: $darkGray;
+  }
+}
+
+.debt {
+  color: $red;
+  font-size: 55px;
+  font-weight: 600;
+
+  @media (max-width: $sm) {
+    font-size: 35px;
+  }
+}
+
+.debtPrefix {
+  color: $red;
+  font-size: 25px;
+  margin-left: 5px;
+  margin-bottom: -20px;
+  font-weight: 500;
+
+  @media (max-width: $sm) {
+    font-size: 12px;
+  }
 }

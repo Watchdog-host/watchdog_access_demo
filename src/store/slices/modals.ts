@@ -1,34 +1,43 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 interface IModal {
-  addIdentityModal: boolean
-  updateIdentityModal: {
-    visible: boolean
-    data: null
-  }
+  addEdgeModal: boolean
+  settingsModal: boolean
+  helpModal: boolean
+  descriptorModal: boolean
+  identityModal: boolean
 }
 
 const initialState: IModal = {
-  addIdentityModal: false,
-  updateIdentityModal: {
-    visible: false,
-    data: null,
-  },
+  addEdgeModal: false,
+  settingsModal: false,
+  helpModal: false,
+  descriptorModal: false,
+  identityModal: false,
 }
 
 const modalsSlice = createSlice({
   name: 'navigation',
   initialState,
   reducers: {
-    setAddIdentityModal: (state, { payload }) => {
-      state.addIdentityModal = payload
+    setAddEdgeModal: (state, { payload }) => {
+      state.addEdgeModal = payload
     },
-    setUpdateIdentityModal: (state, { payload }) => {
-      state.updateIdentityModal = { visible: payload.visible, data: payload.data }
+    setSettingsModal: (state, { payload }) => {
+      state.settingsModal = payload
+    },
+    setHelpModal: (state, { payload }) => {
+      state.helpModal = payload
+    },
+    setDescriptorModal: (state, { payload }) => {
+      state.descriptorModal = payload
+    },
+    setIdentityModal: (state, { payload }) => {
+      state.identityModal = payload
     },
   },
 })
 
-export const { setAddIdentityModal, setUpdateIdentityModal } = modalsSlice.actions
+export const { setAddEdgeModal, setSettingsModal, setHelpModal, setDescriptorModal, setIdentityModal } = modalsSlice.actions
 
 export default modalsSlice

@@ -2,22 +2,14 @@
 
 .ant-input-affix-wrapper {
   width: 100% !important;
-  height: 58px !important;
+  padding: 0 11px !important;
   background: #ffffff;
-  border: 2px solid rgba(195, 176, 176, 0.2) !important;
   border-radius: $radiusSm !important;
   outline: none !important;
-  padding: 0 20px !important;
-}
 
-.simple-input {
-  width: 100% !important;
-  height: 50px !important;
-  background: #ffffff;
-  border: 2px solid rgba(176, 183, 195, 0.2) !important;
-  border-radius: $radiusSm !important;
-  outline: none !important;
-  padding: 0 20px !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: #d9d9d9 !important;
 }
 
 .ant-input {
@@ -31,7 +23,8 @@
 }
 
 .ant-input-lg {
-  height: 54px !important;
+  height: 50px !important;
+  padding: 0 11px !important;
 }
 
 .ant-input:focus {
@@ -40,7 +33,7 @@
 
 .ant-input-affix-wrapper:focus,
 .ant-input-affix-wrapper-focused {
-  border: 2px solid rgba(55, 125, 255, 0.2) !important;
+  border: 1px solid #4096ff !important;
 }
 
 .number {

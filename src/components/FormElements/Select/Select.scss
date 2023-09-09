@@ -1,7 +1,9 @@
+@import 'assets/scss/variables.scss';
+
 .selectBox {
   position: relative;
+
   .ant-select {
-    min-width: 120px;
     .ant-select-selection-item {
       display: flex !important;
       align-items: center;
@@ -31,4 +33,41 @@
     height: 50px !important;
     width: 100% !important;
   }
+
+  .ant-select-disabled:where(.css-dev-only-do-not-override-16aepep).ant-select:not(:where(.css-dev-only-do-not-override-16aepep).ant-select-customize-input) .ant-select-selector {
+    background-color: white !important;
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .multipleSelectIcon {
+    position: absolute;
+    right: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 90%;
+    // background-color: white;
+    padding-right: 10px;
+    border-radius: 8px;
+    @media (max-width: $sm) {
+      padding: 0 3px;
+    }
+  }
+
+  .ant-select-selector:after {
+    content: 'asd' !important;
+    display: none !important;
+  }
+}
+
+.ant-select-dropdown {
+  min-width: 120px !important;
+}
+
+.ant-select-clear {
+  width: 17px !important;
+  height: 17px !important;
+  font-size: 20px !important;
+  top: 40% !important;
+  right: 15px !important;
 }

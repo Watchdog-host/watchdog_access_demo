@@ -1,0 +1,47 @@
+@import 'assets/scss/variables.scss';
+
+.tabBox {
+  display: flex;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 16px;
+  gap: 32px;
+  margin-bottom: 16px;
+
+  .tab {
+    padding: 16px 0;
+    font-weight: normal;
+    line-height: 100%;
+    transition: color 0.2s;
+    position: relative;
+    bottom: -1px;
+    cursor: pointer;
+
+    &:hover {
+      color: #1677ff;
+    }
+
+    &.active {
+      font-weight: 500;
+      color: #1677ff;
+      border-bottom: 2px solid #1677ff;
+    }
+  }
+}
+
+.content {
+  visibility: hidden;
+  height: 0;
+  width: 0;
+  opacity: 0;
+  position: fixed;
+  z-index: -9999;
+
+  &.active {
+    visibility: visible;
+    height: auto;
+    width: auto;
+    opacity: 1;
+    position: relative;
+    z-index: 1;
+  }
+}

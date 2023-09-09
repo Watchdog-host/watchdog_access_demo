@@ -60,6 +60,14 @@
   height: 50px !important;
 }
 
+.ant-dropdown-trigger {
+  white-space: nowrap !important;
+
+  .anticon {
+    display: none !important;
+  }
+}
+
 .ymaps-2-1-29-placemark-overlay {
   /* 2-1-29 - это только для текущей версии. Поменяется версия, поменяется и класс */
   -webkit-filter: drop-shadow(0 2px 2px #999);
@@ -68,7 +76,7 @@
 
 //************************************ Image styles *************************
 .ant-image-mask {
-  border-radius: $radiusSm;
+  border-radius: $radiusSm !important;
 }
 
 //************************************ Menu styles *************************
@@ -89,6 +97,7 @@
 }
 .ant-menu-item-selected {
   background-color: transparent !important ;
+  color: $dark !important;
 }
 
 //************************************ Popconfirm styles *************************
@@ -153,12 +162,21 @@
 
 .ant-image {
   overflow: hidden !important;
-  border-radius: $radiusSm;
+  border-radius: $radiusSm !important ;
+  width: 100% !important;
 }
 
-.ant-image-preview-img{
+.ant-image-preview-img {
+  width: 30% !important;
+  // height: 30% !important;
   transform: scale(2) !important;
-  border-radius: $radiusSm !important;
+  border-radius: $radiusSm !important ;
+}
+.ant-image-img {
+  width: 100% !important;
+}
+.ant-image-preview-operations {
+  display: none !important;
 }
 //************************************ double date  picker styles *************************
 
@@ -168,4 +186,40 @@
     width: 15%;
     display: none;
   }
+}
+
+.ant-drawer-header {
+  padding: 10px 12px 10px 10px !important;
+}
+
+.ant-drawer-footer {
+  padding: 10px 12px !important;
+}
+
+//************************************ ant-steps *************************
+
+.ant-steps-item-icon {
+  svg {
+    position: relative;
+    top: 4px;
+  }
+}
+//************************************ ant-upload *************************
+
+.ant-upload-list-item {
+  // padding: 0px !important;
+  border-radius: 10px !important;
+  img {
+    border-radius: 10px !important;
+  }
+}
+
+.ant-upload-list-item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ant-upload.ant-upload-select {
+  margin: 0 !important;
 }

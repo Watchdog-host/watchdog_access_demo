@@ -1,14 +1,17 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { API_URL } from 'constants/common'
-import { IWatchlistDTO } from 'types'
+import { BASE_URL } from 'constants/common'
+import { IWatchlistDTO, QueryFiltersType } from 'types'
 
 export const watchlistApi = createApi({
   reducerPath: `watchlist`,
   baseQuery: fetchBaseQuery({
-    baseUrl: API_URL,
+    baseUrl: `${BASE_URL}/v1`,
     prepareHeaders(headers) {
-      const token = localStorage.getItem('token')
-      headers.set('Authorization', `Bearer ${token}`)
+      const profileData = localStorage.getItem('profile')
+      if (profileData !== null) {
+        const profile = JSON.parse(profileData)
+        headers.set('Authorization', `Bearer ${profile.token}`)
+      }
       return headers
     },
   }),
@@ -16,10 +19,22 @@ export const watchlistApi = createApi({
 
   endpoints: (builder) => ({
     // queries
-    watchlists: builder.query<IWatchlistDTO[], void>({
-      query() {
+    watchlists: builder.query<
+      IWatchlistDTO[],
+      {
+        filter: { id?: number }
+      }
+    >({
+      query({ filter: { id } }) {
+        const filterParams: QueryFiltersType = {
+          filter: [[[`id`, '=', `${id}`]]],
+        }
+
         return {
           url: `/watchlist/path`,
+          params: {
+            filter: JSON.stringify(filterParams),
+          },
         }
       },
       providesTags: ['Watchlists'],
@@ -70,10 +85,4 @@ export const watchlistApi = createApi({
   }),
 })
 
-export const {
-  useWatchlistsQuery,
-  useAddWatchlistMutation,
-  useWatchlistByIdQuery,
-  useUpdateWatchlistMutation,
-  useDeleteWatchlistMutation,
-} = watchlistApi
+export const { useWatchlistsQuery, useAddWatchlistMutation, useWatchlistByIdQuery, useUpdateWatchlistMutation, useDeleteWatchlistMutation } = watchlistApi

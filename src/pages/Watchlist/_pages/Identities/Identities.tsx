@@ -1,6 +1,6 @@
-import React, { FC, ReactNode, useState } from 'react'
+import { FC, ReactNode, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Col, Row } from 'antd'
+import { Col, Grid, Row } from 'antd'
 import toast from 'react-hot-toast'
 
 import { Button, List, Loader, NoData } from 'components'
@@ -13,16 +13,20 @@ import UpdateIdentityModal from './_components/UpdateIdentityModal'
 import { useGetRole } from 'hooks'
 
 import classes from './Identities.module.scss'
+import { useAppDispatch } from 'store/hooks'
+import { setIdentityModal } from 'store/slices/modals'
+import { logOut } from 'utils'
 
 type Props = {
   children?: ReactNode
 }
 
 const Identities: FC<Props> = () => {
-  const [addIdentity, setAddIdentity] = useState<boolean>(false)
   const [updateIdentity, setUpdateIdentity] = useState<boolean>(false)
   const [selectedIdentity, setSelectedIdentity] = useState<IIdentityDTO>()
-
+  const dispatch = useAppDispatch()
+  const { useBreakpoint } = Grid
+  const { xs } = useBreakpoint()
   const navigate = useNavigate()
   const { id: watchlist_id } = useParams()
   const { isOwner, isAdmin, isAgent, isCustomer } = useGetRole()
@@ -48,12 +52,25 @@ const Identities: FC<Props> = () => {
     toast.promise(mutationPromise, {
       loading: `deleting identity...`,
       success: `successfully delete`,
-      error: ({ data }) => data?.error,
+      error: (error) => {
+        if (error?.status == 'FETCH_ERROR' || error?.status === 401) {
+          logOut()
+          return error?.error || error?.data?.error
+        }
+        return error?.data?.error
+      },
     })
   }
 
+  useEffect(() => {
+    let status = (identitiesQuery.error as any)?.status
+    if (status == 'FETCH_ERROR' || status === 401) {
+      logOut()
+    }
+  }, [identitiesQuery.error])
+
   return (
-    <div className='fade container'>
+    <div className="fade">
       <Row className={'navigation'} align="middle" justify="space-between">
         <Col>
           <Row align="middle" wrap={false} gutter={16}>
@@ -63,11 +80,12 @@ const Identities: FC<Props> = () => {
             <Col>
               <h2>Identities</h2>
             </Col>
-            <Col>
-              <span className={'navigationFoundText'}>
-                {identitiesData?.length ? `Found ${identitiesData?.length} Identities` : 'No found Identities'}
-              </span>
-            </Col>
+
+            {!xs && (
+              <Col>
+                <span className={'navigationFoundText'}>{identitiesData?.length ? `Found ${identitiesData?.length} Identities` : 'No found Identities'}</span>
+              </Col>
+            )}
           </Row>
         </Col>
 
@@ -75,12 +93,7 @@ const Identities: FC<Props> = () => {
           <Col>
             <Row justify="space-between" wrap={false}>
               <Col>
-                <Button
-                  icon={<Plus />}
-                  type="link"
-                  className={'navigationAddButton'}
-                  onClick={() => setAddIdentity(true)}
-                >
+                <Button icon={<Plus />} type="link" className={'navigationAddButton'} onClick={() => dispatch(setIdentityModal(true))}>
                   Add
                 </Button>
               </Col>
@@ -103,10 +116,7 @@ const Identities: FC<Props> = () => {
           <NoData />
         )}
       </div>
-      {addIdentity && <AddIdentityModal visible={addIdentity} setVisible={setAddIdentity} />}
-      {updateIdentity && (
-        <UpdateIdentityModal visible={updateIdentity} setVisible={setUpdateIdentity} data={selectedIdentity} />
-      )}
+      {updateIdentity && <UpdateIdentityModal visible={updateIdentity} setVisible={setUpdateIdentity} data={selectedIdentity} />}
     </div>
   )
 }

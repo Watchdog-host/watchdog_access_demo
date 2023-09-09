@@ -7,7 +7,7 @@
   justify-content: space-between;
   align-items: center;
   width: 48px;
-  height: calc(100vh - 20px);
+  height: calc(100dvh - 20px);
 
   @media (max-width: $sm) {
     width: 15%;
@@ -60,7 +60,7 @@
 
     &:hover {
       background-color: $white;
-      box-shadow: $shadowToDown;
+      box-shadow: $darkShadowToDown;
     }
   }
 

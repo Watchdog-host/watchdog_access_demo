@@ -1,0 +1,106 @@
+@import 'assets/scss/variables.scss';
+
+.map {
+  border-radius: $radius;
+  border: 1px solid #f1f1f1;
+  overflow: hidden;
+  height: calc(100dvh - 124px);
+
+  @media (max-width: $sm) {
+    height: calc(100dvh - 104px);
+  }
+
+  &.isNotMap {
+    margin-top: 20px;
+    margin-right: 20px;
+  }
+}
+
+.markerIcon {
+  border-radius: $radiusFull;
+  width: 15px;
+  height: 15px;
+  border: 7px solid $red;
+  pointer-events: auto;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.edgeStatus {
+  padding: 0.7rem 1rem;
+  background-color: $white;
+  box-shadow: $shadowToDown;
+  position: absolute;
+  z-index: 20;
+  left: 20px;
+  top: 20px;
+  gap: 40px;
+  border-radius: $radiusSm;
+  display: flex;
+  align-items: center;
+
+  .statusBox {
+    font-family: ZonaPro !important;
+    display: flex;
+    flex-direction: column;
+    .title {
+      line-height: 100%;
+      color: $darkGray;
+      font-size: 14px;
+    }
+
+    .edgeCount {
+      font-size: 30px;
+      font-weight: 500;
+    }
+
+    .green,
+    .yellow,
+    .red {
+      font-weight: 500;
+      gap: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 500;
+      font-size: 14px;
+
+      .name {
+        width: 90px;
+      }
+    }
+
+    .green {
+      color: $green;
+    }
+
+    .yellow {
+      color: $yellow;
+    }
+
+    .red {
+      color: $red;
+    }
+  }
+}
+
+.zoomControl {
+  background-color: $white;
+  border-radius: $radiusSm;
+  box-shadow: $shadowToDown;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  z-index: 20;
+  div {
+    cursor: pointer;
+    width: 42.4px;
+    height: 42.4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: $radiusSm;
+  }
+  .disabled {
+    cursor: not-allowed;
+  }
+}

@@ -12,13 +12,17 @@
 }
 
 .mainWrapper {
+  box-shadow: $shadowToDown;
   display: flex;
   background-color: $white;
-  border-radius: $radius $radius 0;
-  height: calc(100vh - 82px);
+  border-radius: $radius 0 0 0;
+  height: calc(100dvh - 82px);
+  position: relative;
 
   @media (max-width: $sm) {
+    height: calc(100dvh - 68px);
     border-radius: 0;
+    gap: 0;
   }
 }
 
@@ -35,7 +39,7 @@
   }
 }
 
-.map {
+.view {
   position: relative;
   width: 50%;
   transition: width 0.1s;
@@ -50,5 +54,33 @@
     box-shadow: 0 0 10px #ccc !important;
     top: 100px;
     left: 0;
+  }
+
+  &.asd {
+    margin-left: 25px;
+  }
+
+  .navigateBox {
+    position: absolute;
+    top: 140px;
+    z-index: 10;
+    left: -22px;
+    background-color: $white;
+    padding: 10px 5px;
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    box-shadow: $shadowToDown;
+
+    div {
+      cursor: pointer;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: $radiusSm;
+    }
   }
 }

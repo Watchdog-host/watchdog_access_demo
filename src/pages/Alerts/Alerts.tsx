@@ -1,231 +1,233 @@
-import { FC, ReactNode, memo, useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { Avatar, Col, DatePicker, Popconfirm, Row, Select, Table } from 'antd'
-import _ from 'lodash'
-import { AlertOctagon, AlertTriangle, InfoCircle, Pencil, Trash } from 'tabler-icons-react'
-import dayjs from 'dayjs'
+import { FC, ReactNode, UIEvent, memo, useEffect, useMemo, useRef, useState } from 'react'
+import { Col, Grid, Row } from 'antd'
+import _, { debounce } from 'lodash'
+import { AlertOctagon, AlertTriangle, ChevronLeft, ChevronRight, Filter, H1, InfoCircle } from 'tabler-icons-react'
+import dayjs, { Dayjs } from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 
-import { useAccessCountQuery, useDevicesQuery, useAccessQuery } from 'store/endpoints'
+import { useLazyAccessAlertsQuery, useLazyAccessCountQuery, useLazyAlertQuery } from 'store/endpoints'
 import { useAppSelector } from 'store/hooks'
 import { svgVariables } from 'constants/common'
 
-import { AlertTypeEnum, DescriptorTypeEnum, DeviceTypeEnum, GrantTypeEnum, PaymentTypeEnum } from 'constants/enums'
+import { AlertTypeEnum, DescriptorTypeEnum, GrantTypeEnum } from 'constants/enums'
 
 import classes from './Alerts.module.scss'
-import { ColumnsType } from 'antd/es/table'
-import { Button } from 'components'
-import { IAccessDTO } from 'types'
+import { Button, Loader, NoData } from 'components'
 import AlertCard from './_components/AlertCard'
+import AlertFilterModal from './_components/AlertFilterModal'
+import { useDebounce, useLocalStorage } from 'react-use'
+import { logOut } from 'utils'
+import { IAccessDTO } from 'types'
+import Chart from './_components/Chart'
 
 type Props = {
   children?: ReactNode
 }
+
+export interface ILocalData {
+  range_date?: Dayjs[]
+  access_type?: string
+  descriptor_type?: DescriptorTypeEnum
+  grant_type?: GrantTypeEnum
+  alert_type?: AlertTypeEnum
+  device_id?: number[]
+}
 dayjs.extend(utc)
 
-const { RangePicker } = DatePicker
 const Alerts: FC<Props> = () => {
-  const [devices, setDevices] = useState<number[]>([])
-  const [time, setTime] = useState({
-    start: dayjs().utc(),
-    end: dayjs().utc(),
-  })
-
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
+  const [filterModal, setFilterModal] = useState(false)
+  const [offset, setOffset] = useState(0)
+  const [limit, setLimit] = useState(15)
+  const { useBreakpoint } = Grid
+  const { xs } = useBreakpoint()
   const { currentEdge } = useAppSelector((state) => state.navigation)
+  const [localData, setLocalData] = useLocalStorage<ILocalData>('alerts_filter')
+  const [alertsData, setAlertsData] = useState<IAccessDTO[]|undefined>([])
+  const scrollSection = useRef<HTMLDivElement>(null)
+  const url = useRef('')
+  const isFetch = useRef(true)
 
-  const params = {
-    device_id: devices,
-    startDate: time.start.startOf('day'),
-    endDate: time.end.endOf('day'),
-  }
+  
+  const [getLazyAlerts, alertQuery] = useLazyAlertQuery()
+  const [getLazyAccessAlerts, accessAlertQuery] = useLazyAccessAlertsQuery()
+  const params: any = useMemo(() => {
+    setAlertsData(alertQuery.data)
+    return {
+      ...localData,
+      startDate: localData?.range_date ? dayjs(localData.range_date[0]).toDate() : dayjs().startOf('day').toDate(),
+      endDate: localData?.range_date ? dayjs(localData.range_date[1]).toDate() : dayjs().endOf('day').toDate(),
+    }
+  }, [localData,alertQuery.isSuccess])
 
-  const { data: accessData } = useAccessQuery({ ...params, offset: 0, limit: 10 })
-  const { data: devicesData } = useDevicesQuery({ filter: { edge_id: currentEdge?.id } })
-  const { data: insideData } = useAccessCountQuery({
-    mode: 'inside',
-    ...params,
-  })
-  const { data: returnedData } = useAccessCountQuery({
-    mode: 'returned',
-    ...params,
-  })
-  const { data: informationData } = useAccessCountQuery({
-    mode: 'information',
-    ...params,
-  })
-  const { data: warningData } = useAccessCountQuery({
-    mode: 'warning',
-    ...params,
-  })
-  const { data: criticalData } = useAccessCountQuery({
-    mode: 'critical',
-    ...params,
-  })
+  useEffect(() => {
+    if (currentEdge) {
+      getLazyAlerts({ ...params, offset, limit, sort: '-time', url: url.current || currentEdge?.private_ip }).then((res) => {
+        if ((res.error as any)?.message === 'Aborted') {
+          url.current = currentEdge?.public_ip
+          getLazyAlerts({ ...params, offset, limit, sort: '-time', url: currentEdge?.public_ip })
+        }
+      })
+    }
+  }, [currentEdge, params, offset, limit])
 
-  const groupedOptions = _.groupBy(devicesData, 'type')
-  const deviceOptions = _.map(groupedOptions, (data, key) => ({
-    label: DeviceTypeEnum[key as any],
-    options: data?.map((device) => ({
-      label: device.title,
-      value: device.id,
-    })),
-  }))
+
+  useEffect(() => {
+    if (currentEdge) {
+
+      getLazyAccessAlerts({ ...params, url: url.current || currentEdge?.private_ip }).then((res) => {
+        if ((res.error as any)?.message === 'Aborted') {
+          url.current = currentEdge?.public_ip
+          getLazyAccessAlerts({ ...params, url: currentEdge?.public_ip })
+        }
+      })
+    }
+  }, [currentEdge, params])
+
+  useEffect(() => {
+    url.current = ''
+  }, [currentEdge])
 
   const infoCard1 = [
     {
       label: 'All',
-      value: Number(insideData?.count) + Number(returnedData?.count) || 0,
-      isMain: true,
+      value: accessAlertQuery.data?.total_count || 0,
     },
-    { label: 'Inside', value: insideData?.count || 0 },
-    { label: 'Returned', value: returnedData?.count || 0 },
+    { label: 'Inside', value: accessAlertQuery.data?.inside_count || 0 },
+    { label: 'Returned', value: accessAlertQuery.data?.outside_count || 0 },
   ]
-
   const infoCard2 = [
     {
       label: 'Informations',
-      value: informationData?.count || 0,
+      value: accessAlertQuery.data?.information_amount || 0,
       icon: <InfoCircle size={28} color={svgVariables.$blue} />,
       color: svgVariables.$blue,
     },
     {
       label: 'Warnings',
-      value: warningData?.count || 0,
+      value: accessAlertQuery.data?.warning_amount || 0,
       icon: <AlertTriangle size={28} color={svgVariables.$yellow} />,
       color: svgVariables.$yellow,
     },
     {
       label: 'Criticals',
-      value: criticalData?.count || 0,
+      value: accessAlertQuery.data?.critical_amount || 0,
       icon: <AlertOctagon size={28} color={svgVariables.$red} />,
       color: svgVariables.$red,
     },
   ]
+  useEffect(() => {
 
-  const data: IAccessDTO[] = [
-    {
-      image: 'img',
-      type: 1,
-      time: '2023/06/21',
-      descriptor: 'descriptor',
-      descriptor_type: DescriptorTypeEnum.Plate,
-      confidence: 50,
-      verified: true,
-      device_title: 'Camera',
-      device_type: DeviceTypeEnum.Camera,
-      alert_type: AlertTypeEnum.Critical,
-      grant_type: GrantTypeEnum.Deny,
-      watchlist_title: 'Dog',
-      identity_title: 'User',
-      identity_id: null,
-    },
-  ]
+    const debouncedOnScroll = debounce(() => {
+      if (!scrollSection.current) return
+      const scrollableHeight = scrollSection.current.scrollHeight - scrollSection.current.clientHeight
+      const currentScrollPosition = Math.floor((scrollSection.current.scrollTop * 100) / scrollableHeight)
+
+      if (currentScrollPosition > 80 && isFetch.current) {
+        isFetch.current = false
+        setOffset((prev) => prev + 10)
+      }
+      else {
+        isFetch.current = true
+      }
+    }, 100)
+
+
+    scrollSection.current?.addEventListener('scroll', debouncedOnScroll)
+
+    return () => {
+      scrollSection.current?.removeEventListener('scroll', debouncedOnScroll)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (alertQuery.isSuccess) {
+      setAlertsData((prev) => [...(prev as IAccessDTO[]), ...alertQuery.data])
+    }
+  }, [alertQuery.data])
+
+  useEffect(() => {
+    let status = (alertQuery.error as any)?.status
+    if (status == 'FETCH_ERROR' || status == 401) {
+      logOut()
+    }
+  }, [alertQuery.error])
+
   return (
-    <div className={`fade container`}>
-      <Row gutter={16} className={'navigation'} align="middle" justify="space-between" wrap={false}>
+    <div className={`fade`}>
+      <Row gutter={!xs ? 16 : 0} className={'navigation'} align="middle" justify="space-between" wrap={xs}>
         <Col>
           <Row align="middle" wrap={false}>
             <Col>
               <h2>Alerts</h2>
             </Col>
-
             <Col>
-              <span className={'navigationFoundText'}>{[] ? `Found ${[]?.length} Alerts` : 'No found Alerts'}</span>
+              <span className={'navigationFoundText'}>{`${dayjs(localData?.range_date && localData?.range_date[0])
+                .startOf('day')
+                .format('DD.MM HH:mm')} - ${dayjs(localData?.range_date ? localData?.range_date[1] : dayjs().endOf('day')).format('DD:MM HH:mm')}`}</span>
             </Col>
           </Row>
         </Col>
         <Col>
-          {/* <Row gutter={12}> */}
-          {/* <Col span={14}> */}
-          <RangePicker value={[time.start, time.end]} onChange={(e: any) => setTime({ start: e[0], end: e[1] })} />
-          {/* </Col> */}
-          {/* <Col span={10}>
-                <Select
-                  placeholder="Select filter"
-                  mode="multiple"
-                  maxTagCount={1}
-                  options={deviceOptions}
-                  onChange={(e) => setDevices(e)}
-                  />
-              </Col> */}
-          {/* </Row> */}
+          <Button className={classes.filterBtn} icon={<Filter />} type="link" onClick={() => setFilterModal(true)}>
+            {!xs && 'Filter'}
+            {Object.keys(localData || {}).length ? <div className={classes.filterBadge}>{Object.keys(localData || {}).length}</div> : null}
+          </Button>
         </Col>
       </Row>
 
-      <div className="dataWrapper">
-        <Row justify="space-between" gutter={16} className={classes.statusBox}>
-          <Col span={10}>
+      <div ref={scrollSection} className={classes.dataWrapper}>
+        <Row justify="space-between" gutter={[16, 16]} className={classes.statusBox}>
+          <Col span={xs ? 24 : 11}>
             <div className={classes.card}>
-              <Row align="middle" justify="space-between" className={classes.cardInside}>
-                {infoCard1.map(({ label, value, isMain }) => (
-                  <Col key={label} className={`${classes.cardInfo} ${isMain && classes.cardInfoMain}`} span={8}>
+              <Row align="top" justify="space-between" className={classes.cardInside}>
+                {infoCard1.map(({ label, value }, i) => (
+                  <Col key={label} className={classes.cardInfo} span={8}>
                     <p>{label}</p>
-                    <h3>{value}</h3>
+                    <span style={{ fontWeight: 700, fontSize: i !== 0 ? '20px' : '24px' }}>{value}</span>
                   </Col>
                 ))}
               </Row>
             </div>
           </Col>
 
-          <Col span={14}>
+          <Col span={xs ? 24 : 13}>
             <div className={classes.card}>
               <Row align="middle" justify="space-between" className={classes.cardInside}>
-                {pathname.slice(1) === 'income' ? (
-                  <div className={classes.cardRevenue}>
-                    <p>Total income</p>
-                    <h1>{Number(4500).toLocaleString('ru')} UZS</h1>
-                  </div>
-                ) : (
-                  infoCard2.map(({ label, value, icon, color }) => (
-                    <Col key={label} className={classes.cardInfo} span={6}>
-                      <p style={{ color }}>{label}</p>
-                      <Row align="middle" gutter={8}>
-                        <Col>
-                          <Row>{icon}</Row>
-                        </Col>
-                        <Col>
-                          <h3 style={{ color }}>{value}</h3>
-                        </Col>
-                      </Row>
-                    </Col>
-                  ))
-                )}
+                {infoCard2.map(({ label, value, icon, color }) => (
+                  <Col key={label} className={classes.cardInfo} span={6}>
+                    <p>{label}</p>
+                    <Row align="middle" gutter={8}>
+                      <Col>
+                        <Row>{icon}</Row>
+                      </Col>
+                      <Col>
+                        <h3 style={{ color }}>{value}</h3>
+                      </Col>
+                    </Row>
+                  </Col>
+                ))}
               </Row>
             </div>
           </Col>
         </Row>
-        {/* <div>
-          {reports?.map(({ id, device_title, time, watchlist_title, identity_title }) => (
-            <ReportsList
-              key={id}
-              title={device_title}
-              time={time}
-              description={{
-                label: watchlist_title,
-                value: identity_title,
-              }}
-            />
-          ))}
-        </div> */}
-        {data.map((i) => (
-          <AlertCard
-            type={i.type}
-            alert_type={i.alert_type}
-            verified={i.verified}
-            confidence={i.confidence}
-            device_title={i.device_title}
-            device_type={i.device_type}
-            descriptor={i.descriptor}
-            identity_title={i.identity_title}
-            descriptor_type={i.descriptor_type}
-            watchlist_title={i.watchlist_title}
-            identity_id={i.identity_id}
-            time={i.time}
-          />
-        ))}
+        <Chart data={accessAlertQuery.data} />
+        {alertQuery.isLoading ? (
+          <Loader />
+        ) : alertsData?.length ? (
+          <Row gutter={[12, 12]}>
+            {alertsData?.map((alert) => (
+              <Col span={24} key={alert.id}>
+                <AlertCard data={alert} />
+              </Col>
+            ))}
+            {alertQuery.isFetching ? <Loader className={classes.loader} /> : null}
+          </Row>
+        ) : (
+          null
+        )}
+
       </div>
+      {filterModal && <AlertFilterModal visible={filterModal} setVisible={setFilterModal} localData={localData} setLocalData={setLocalData} />}
     </div>
   )
 }

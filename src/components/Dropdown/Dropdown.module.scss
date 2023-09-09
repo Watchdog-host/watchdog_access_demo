@@ -15,12 +15,7 @@
   width: 20px;
   display: flex;
   align-items: center;
-  margin-top: 2px;
   transition: 0.7s;
-
-  @media (min-width: $sm) {
-    margin-left: 6px;
-  }
 }
 
 .disabled * {

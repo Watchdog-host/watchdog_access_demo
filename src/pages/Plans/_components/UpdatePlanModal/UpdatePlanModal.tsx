@@ -16,12 +16,7 @@ const UpdateCameraModal: FC<Props> = ({ visible, setVisible, data }) => {
   const form = usePlanForm({ data, visible, setVisible })
   const { pathname } = useLocation()
   return (
-    <Modal
-      title={`Update ${_.upperFirst(pathname.slice(1))}`}
-      open={visible}
-      onOk={() => setVisible(false)}
-      onCancel={() => setVisible(false)}
-    >
+    <Modal title={`Update ${_.upperFirst(pathname.slice(1))}`} open={visible} onOk={() => setVisible(false)} onCancel={() => setVisible(false)}>
       {form}
     </Modal>
   )

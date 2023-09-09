@@ -1,71 +1,109 @@
 import { Dayjs } from 'dayjs'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { API_URL } from 'constants/common'
-import { IAccessDTO, QueryFiltersType } from 'types'
-import { AccessTypeEnum } from 'constants/enums'
+import { BASE_URL } from 'constants/common'
+import { FILTER_ACTIONS_TYPE, IAccessDTO, QueryFiltersType } from 'types'
+import { AccessTypeEnum, AlertTypeEnum, DescriptorTypeEnum, GrantTypeEnum, PaymentTypeEnum } from 'constants/enums'
 
 type CountType = {
   count: number
 }
 
+type AccessFilterType = {
+  url: string
+  mode?: 'inside' | 'returned' | AlertTypeEnum
+  offset?: number
+  limit?: number
+
+  startDate: Dayjs
+  endDate: Dayjs
+  startPaidDate?: Dayjs
+  endPaidDate?: Dayjs
+  alert_type?: AlertTypeEnum
+  access_type?: AccessTypeEnum
+  descriptor_type?: DescriptorTypeEnum
+  grant_type?: GrantTypeEnum
+  payment_type?: PaymentTypeEnum
+  device_id?: number[]
+  sort?: keyof IAccessDTO
+}
+
 export const accessApi = createApi({
   reducerPath: `access`,
   baseQuery: fetchBaseQuery({
-    baseUrl: API_URL,
+    // baseUrl: `${BASE_URL}/v1`,
+    timeout: 5000,
     prepareHeaders(headers) {
-      const token = localStorage.getItem('token')
-      headers.set('Authorization', `Bearer ${token}`)
+      const profileData = localStorage.getItem('profile')
+      if (profileData !== null) {
+        const profile = JSON.parse(profileData)
+        headers.set('Authorization', `Bearer ${profile.token}`)
+      }
       return headers
     },
   }),
-  tagTypes: ['Access'],
+  tagTypes: ['Access', 'AccessRevenue', 'Checkin', 'Payment'],
 
   endpoints: (builder) => ({
     // queries
-    accessCount: builder.query<
-      CountType,
-      {
-        mode?: 'inside' | 'returned' | 'information' | 'warning' | 'critical'
-        // device_id: number[]
-        startDate: Dayjs
-        endDate: Dayjs
-      }
-    >({
-      query({
-        mode = 'inside',
-        //  device_id,
-        startDate,
-        endDate,
-      }) {
+    accessCount: builder.query<CountType, AccessFilterType>({
+      query({ url, mode = 'inside', startDate, endDate, startPaidDate, endPaidDate, alert_type, access_type, descriptor_type, grant_type, payment_type, device_id }) {
         const insideParams: QueryFiltersType = {
           filter: [
             [
               [`access_id`, '=', null],
-              [`type`, '=', AccessTypeEnum.Registration],
+              [`type`, '=', AccessTypeEnum.CheckIn],
               [`verified`, '=', true],
-              [`time`, '>=', `${startDate}`],
-              [`time`, '<=', `${endDate}`],
-            ],
+
+              [`time`, '>=', startDate],
+              [`time`, '<=', endDate],
+
+              ...(startPaidDate ? [['paid_at', '>=', startPaidDate]] : []),
+              ...(endPaidDate ? [['paid_at', '<=', endPaidDate]] : []),
+              ...(typeof alert_type === 'number' ? [['alert_type', '=', alert_type]] : []),
+              ...(typeof access_type === 'number' ? [['type', '=', access_type]] : []),
+              ...(typeof descriptor_type === 'number' ? [['descriptor_type', '=', descriptor_type]] : []),
+              ...(typeof grant_type === 'number' ? [['grant_type', '=', grant_type]] : []),
+              ...(typeof payment_type === 'number' ? [['payment_type', '=', payment_type]] : []),
+              ...(device_id ? [['device_id', 'in', device_id]] : []),
+            ].filter(Boolean) as FILTER_ACTIONS_TYPE,
           ],
         }
         const returnedParams: QueryFiltersType = {
           filter: [
             [
               [`access_id`, '>', 0],
-              [`type`, '=', AccessTypeEnum.Checkout],
+              [`type`, '=', AccessTypeEnum.CheckOut],
               [`verified`, '=', true],
-              [`time`, '>=', `${startDate}`],
-              [`time`, '<=', `${endDate}`],
-            ],
+
+              [`time`, '>=', startDate],
+              [`time`, '<=', endDate],
+              ...(startPaidDate ? [['paid_at', '>=', startPaidDate]] : []),
+              ...(endPaidDate ? [['paid_at', '<=', endPaidDate]] : []),
+              ...(typeof alert_type === 'number' ? [['alert_type', '=', alert_type]] : []),
+              ...(typeof access_type === 'number' ? [['type', '=', access_type]] : []),
+              ...(typeof descriptor_type === 'number' ? [['descriptor_type', '=', descriptor_type]] : []),
+              ...(typeof grant_type === 'number' ? [['grant_type', '=', grant_type]] : []),
+              ...(typeof payment_type === 'number' ? [['payment_type', '=', payment_type]] : []),
+              ...(device_id ? [['device_id', 'in', device_id]] : []),
+            ].filter(Boolean) as FILTER_ACTIONS_TYPE,
           ],
         }
-        const infoParams: QueryFiltersType = {
+        const alertParams: QueryFiltersType = {
           filter: [
             [
-              [`alert`, '=', mode === 'information' ? 1 : mode === 'warning' ? 2 : 3],
-              [`time`, '>=', `${startDate}`],
-              [`time`, '<=', `${endDate}`],
-            ],
+              [`alert_type`, '=', mode],
+
+              [`time`, '>=', startDate],
+              [`time`, '<=', endDate],
+
+              ...(startPaidDate ? [['paid_at', '>=', startPaidDate]] : []),
+              ...(endPaidDate ? [['paid_at', '<=', endPaidDate]] : []),
+              ...(typeof alert_type === 'number' ? [['alert_type', '=', alert_type]] : []),
+              ...(typeof access_type === 'number' ? [['type', '=', access_type]] : []),
+              ...(typeof descriptor_type === 'number' ? [['descriptor_type', '=', descriptor_type]] : []),
+              ...(typeof grant_type === 'number' ? [['grant_type', '=', grant_type]] : []),
+              ...(device_id ? [['device_id', 'in', device_id]] : []),
+            ].filter(Boolean) as FILTER_ACTIONS_TYPE,
           ],
         }
 
@@ -75,71 +113,65 @@ export const accessApi = createApi({
         } else if (mode === 'returned') {
           filterParams = returnedParams
         } else {
-          filterParams = infoParams
+          filterParams = alertParams
         }
-        // device_id.length && filterParams.filter?.[0].push([`device_id`, 'in', device_id])
+
         return {
-          url: `/access/count`,
+          url: `${url}/api/v1/access/count`,
           params: {
             filter: JSON.stringify(filterParams),
           },
         }
       },
+      providesTags: ['Access'],
     }),
 
-    access: builder.query<
+    checkin: builder.query<
       IAccessDTO[],
       {
-        // device_id: number[]
-        startDate: Dayjs
-        endDate: Dayjs
-        offset: number
-        limit: number
+        descriptor: string
+        descriptor_type: number
+        url: string
       }
     >({
-      query({ startDate, endDate, offset, limit }) {
-        const filterParams: QueryFiltersType = {
-          filter: [
-            [
-              [`verified`, '=', true],
-              [`time`, '>=', `${startDate}`],
-              [`time`, '<=', `${endDate}`],
-            ],
-          ],
-        }
+      query({ url, descriptor, descriptor_type }) {
         return {
-          url: `/access`,
-          params: {
-            filter: JSON.stringify(filterParams),
-            offset: offset ? offset : 0,
-            limit: limit ? limit : 6,
-          },
+          url: `${url}/api/v1/access/checkin`,
+          params: { descriptor, descriptor_type },
         }
       },
-      providesTags: ['Access'],
+      providesTags: ['Checkin'],
     }),
 
-    accessRevenue: builder.query<
-      {
-        revenue: number
-      },
-      {
-        startDate: Dayjs
-        endDate: Dayjs
-      }
-    >({
-      query({ startDate, endDate }) {
+    //mutations
+    addCheckin: builder.mutation<IAccessDTO[], { url: string; type: AccessTypeEnum; descriptor: string; descriptor_type: number }>({
+      query({ url, ...variables }) {
         return {
-          url: `/access/revenue`,
-          params: {
-            from: startDate.valueOf(),
-            to: endDate.valueOf(),
-          },
+          url: `${url}/api/v1/access/checkin`,
+          method: `POST`,
+          body: variables,
         }
       },
-      providesTags: ['Access'],
+      invalidatesTags: ['Checkin'],
+    }),
+    addAccessPayment: builder.mutation<{ url: string; id: number; paid_amount: number; payment_type: PaymentTypeEnum }, any>({
+      query({ url, ...variables }) {
+        return {
+          url: `${url}/api/v1/access/payment`,
+          method: `POST`,
+          body: variables,
+        }
+      },
+      invalidatesTags: ['Payment'],
     }),
   }),
 })
 
-export const { useAccessCountQuery, useAccessQuery, useAccessRevenueQuery } = accessApi
+export const {
+  useAccessCountQuery,
+  useLazyAccessCountQuery,
+
+  useLazyCheckinQuery,
+  useAddCheckinMutation,
+  useAddAccessPaymentMutation,
+} = accessApi

@@ -1,0 +1,10 @@
+@import 'assets/scss/variables.scss';
+
+.hover {
+  position: fixed;
+  padding: 6px 1rem;
+  border-radius: $radiusSm;
+  background-color: $white;
+  box-shadow: $shadowToDown;
+  z-index: 11;
+}

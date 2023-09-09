@@ -15,17 +15,7 @@ type Props = {
   children?: ReactNode
 }
 
-const FieldGenerator: FC<Props> = ({
-  name,
-  label,
-  keyName,
-  buttonName,
-  initialValue,
-  withoutMinus,
-  withoutAdd,
-  formProps,
-  children,
-}) => {
+const FieldGenerator: FC<Props> = ({ name, label, keyName, buttonName, initialValue, withoutMinus, withoutAdd, formProps, children }) => {
   return (
     <>
       <Form.List name={name} initialValue={initialValue}>
@@ -45,7 +35,7 @@ const FieldGenerator: FC<Props> = ({
               <Row justify="center">
                 <Button
                   fullWidth
-                  type="ghost"
+                  type="primary"
                   size="large"
                   icon={<Plus />}
                   onClick={() => add()}

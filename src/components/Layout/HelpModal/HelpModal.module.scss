@@ -1,0 +1,19 @@
+@import 'assets/scss/variables.scss';
+
+.title {
+  text-align: center;
+  margin: 10px;
+}
+
+.frame {
+  background-color: $gray;
+  border-radius: $radiusSm;
+  padding: 1rem 0;
+  position: relative;
+
+  .info {
+    flex-direction: column;
+    padding: 0 2rem;
+    margin: auto;
+  }
+}

@@ -1,16 +1,19 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { API_URL } from 'constants/common'
-import { QueryFiltersType, IDeviceDTO } from 'types'
+import { BASE_URL } from 'constants/common'
+import { QueryFiltersType, IDeviceDTO, IAccessDTO } from 'types'
 
 export const devicesApi = createApi({
   reducerPath: `device`,
   keepUnusedDataFor: 0.1,
   baseQuery: fetchBaseQuery({
-    baseUrl: API_URL,
+    baseUrl: `${BASE_URL}/v1`,
     prepareHeaders(headers) {
-      const token = localStorage.getItem('token')
-      headers.set('Authorization', `Bearer ${token}`)
-      headers.set('cache-control', `must-revalidate,no-cache,no-store`)
+      const profileData = localStorage.getItem('profile')
+      if (profileData !== null) {
+        const profile = JSON.parse(profileData)
+        headers.set('Authorization', `Bearer ${profile.token}`)
+        headers.set('cache-control', `must-revalidate,no-cache,no-store`)
+      }
       return headers
     },
   }),
@@ -31,6 +34,7 @@ export const devicesApi = createApi({
         }
         type && filterParams.filter?.[0].push([`type`, '=', `${type}`])
         id && id.length && filterParams.filter?.[0].push([`id`, 'in', id])
+
         return {
           url: `/device`,
           params: {
@@ -93,7 +97,7 @@ export const devicesApi = createApi({
       invalidatesTags: ['Devices', 'DeviceById'],
     }),
 
-    addDeviceDescriptor: builder.mutation<IDeviceDTO, { id: number }>({
+    addDeviceDescriptor: builder.mutation<IAccessDTO, { id?: number }>({
       query({ id, ...variables }) {
         return {
           url: `/device/${id}/descriptor`,
@@ -108,6 +112,7 @@ export const devicesApi = createApi({
 
 export const {
   useDevicesQuery,
+  useLazyDevicesQuery,
   useDeviceByIdQuery,
   useDeviceSnapshotQuery,
   useAddDeviceMutation,

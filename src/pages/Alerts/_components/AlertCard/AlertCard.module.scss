@@ -1,95 +1,137 @@
 @import 'assets/scss/variables.scss';
 
 .statusBox {
-  background-color: $lightGray;
   padding: 10px;
   border-top-left-radius: $radiusSm;
   border-bottom-left-radius: $radiusSm;
-  box-shadow: $shadowToDownDark;
+  box-shadow: $darkShadowToDown;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @media (max-width: $sm) {
+    gap: 1rem;
+    padding: 10px;
+  }
+
   .devider {
     margin: 0.6rem 0 !important;
   }
 }
 
 .content {
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   border-top-right-radius: $radiusSm;
   border-bottom-right-radius: $radiusSm;
   background-color: black;
   background-color: $white;
-  box-shadow: $shadowToDownDark;
+  box-shadow: $darkShadowToDown;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
 
-  img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: $radiusSm;
+  @media (max-width: $sm) {
+    gap: 1rem;
+    justify-content: start;
+    flex-wrap: wrap-reverse;
   }
 
-  .infoHeader {
+  * {
+    white-space: nowrap;
+    line-height: 100%;
+  }
+
+  .item1 {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 1rem;
 
-    .date {
-      font-size: 15px;
-      font-weight: 300;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+    @media (max-width: $sm) {
+      width: 100%;
+    }
 
+    div {
       &:nth-child(2) {
-        font-weight: lighter;
+        width: 100%;
       }
     }
 
-    span {
+    .img {
+      width: 53px !important;
+      height: 53px !important;
+      object-fit: cover;
+      border-radius: $radiusSm;
+    }
+
+    .imgIcon {
+      width: 53px;
+      height: 53px;
+      border-radius: $radiusSm;
+
+      svg {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .title {
       display: flex;
       align-items: center;
-      font-size: 15px;
+      gap: 5px;
+      font-size: 12px;
+    }
+
+    .infoBox {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      .descriptor {
+        font-size: 22px;
+        width: 100%;
+        margin-top: 10px;
+        font-family: 'Nummernschild';
+      }
+    }
+  }
+
+  .confidence {
+    font-weight: 500;
+    font-size: 18px;
+  }
+
+  .dateBox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 !important;
+    position: relative;
+    right: 40px;
+    top: 3px;
+
+    @media (max-width: $sm) {
+      right: 0px;
+      top: 0;
+    }
+
+    .date {
+      line-height: 100%;
+      font-weight: lighter;
     }
 
     .confidenceBox {
       display: flex;
       align-items: center;
-      gap: 3px;
-      font-weight: 500;
-      font-size: 15px;
     }
   }
+}
 
-  h2 {
-    font-size: 2rem;
-  }
+.moreBox {
+  position: absolute;
+  top: 8px;
+  right: 5px;
 
-  .title {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .infoBox {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    p {
-      font-size: 22px;
-      line-height: 100%;
-    }
-
-    span {
-      display: flex;
-      align-items: center;
-    }
-
-    .descriptor {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-    }
+  @media (max-width: $sm) {
+    top: 5px;
   }
 }

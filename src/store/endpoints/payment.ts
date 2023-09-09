@@ -1,14 +1,17 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { API_URL } from 'constants/common'
+import { BASE_URL } from 'constants/common'
 import { IPaymentDTO } from 'types'
 
 export const paymentApi = createApi({
   reducerPath: `payment`,
   baseQuery: fetchBaseQuery({
-    baseUrl: API_URL,
+    baseUrl: `${BASE_URL}/v1`,
     prepareHeaders(headers) {
-      const token = localStorage.getItem('token')
-      headers.set('Authorization', `Bearer ${token}`)
+      const profileData = localStorage.getItem('profile')
+      if (profileData !== null) {
+        const profile = JSON.parse(profileData)
+        headers.set('Authorization', `Bearer ${profile.token}`)
+      }
       return headers
     },
   }),
@@ -70,10 +73,4 @@ export const paymentApi = createApi({
   }),
 })
 
-export const {
-  usePaymentsQuery,
-  usePaymentByIdQuery,
-  useAddPaymentMutation,
-  useUpdatePaymentMutation,
-  useDeletePaymentMutation,
-} = paymentApi
+export const { usePaymentsQuery, usePaymentByIdQuery, useAddPaymentMutation, useUpdatePaymentMutation, useDeletePaymentMutation } = paymentApi

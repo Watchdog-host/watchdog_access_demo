@@ -35,25 +35,61 @@ export enum PaymentTypeEnum {
 }
 
 export enum AlertTypeEnum {
-  None = 0,
-  Information = 1,
-  Warning = 2,
-  Critical = 3,
+  Information = 0,
+  Warning = 1,
+  Critical = 2,
 }
 export enum GrantTypeEnum {
-  Undefined = 0,
-  Allow = 1,
-  Deny = 2,
+  Allow = 0,
+  Deny = 1,
 }
 
 export enum AccessTypeEnum {
-  Undefined = 0,
-  Registration = 1,
-  Checkout = 2,
+  CheckIn = 0,
+  CheckOut = 1,
 }
 
 export enum StatusTypeEnum {
   Online = 0,
   Degraded = 1,
   Offline = 2,
+}
+export enum EdgeStatusEnum {
+  Online = 0,
+  Degraded = 1,
+}
+export enum DeviceModelEnum {
+  Gateway = 0,
+  OpenCV = 1,
+}
+
+export enum BarcodeBinarizerEnum {
+  LocalAvarage = 0,
+  GlobalHistogram = 1,
+  FixedThreshold = 2,
+  BoolCast = 3,
+}
+
+export enum PrinterTypeEnum {
+  Gateway = 0,
+  CUPS = 1,
+}
+
+export enum GenderTypeEnum {
+  Male = 0,
+  Female = 1,
+}
+
+export enum EdgeTypeEnum {
+  Virtual = 0,
+  Physical = 1,
+}
+
+export enum WatchlistTypeEnum {
+  Timely = 0,
+}
+
+export enum ViewTypeEnum {
+  Access = 0,
+  Map = 1,
 }

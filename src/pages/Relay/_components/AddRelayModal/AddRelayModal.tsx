@@ -15,12 +15,7 @@ const AddPrinterModal: FC<Props> = ({ visible, setVisible }) => {
   const { pathname } = useLocation()
 
   return (
-    <Modal
-      title={`Add ${_.upperFirst(pathname.slice(1))}`}
-      open={visible}
-      onOk={() => setVisible(false)}
-      onCancel={() => setVisible(false)}
-    >
+    <Modal title={`Add ${_.upperFirst(pathname.slice(1))}`} open={visible} onOk={() => setVisible(false)} onCancel={() => setVisible(false)}>
       {form}
     </Modal>
   )

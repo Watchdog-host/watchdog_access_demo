@@ -4,9 +4,12 @@ import { toast } from 'react-hot-toast'
 
 import { Button, FormElements } from 'components'
 import { ROLE_SELECTS } from 'constants/common'
-import { useAddAccountMutation, useProfileQuery, useUpdateAccountMutation } from 'store/endpoints'
+import { useAddAccountMutation, useUpdateAccountMutation } from 'store/endpoints'
 import { useGetRole } from 'hooks'
 import { useAppSelector } from 'store/hooks'
+import { logOut, validateEmail } from 'utils'
+import { IProfileDTO } from 'types'
+import { useLocalStorage } from 'react-use'
 
 export type Props = {
   data?: any
@@ -18,20 +21,23 @@ const useAccountForm = ({ data, visible, setVisible }: Props = {}) => {
   const [form] = Form.useForm()
 
   const { currentEdge } = useAppSelector((state) => state.navigation)
-  const { isOwner, isAdmin } = useGetRole()
+  const { isOwner, isAdmin, isAgent, isCustomer } = useGetRole()
 
-  const { data: profileData } = useProfileQuery()
+  const [localProfile] = useLocalStorage<IProfileDTO>('profile')
+
   const [addMutation, { isLoading }] = useAddAccountMutation()
   const [updateMutation, { isLoading: updateLoading }] = useUpdateAccountMutation()
 
-  const filteredRoles: any = ROLE_SELECTS.filter((type) => Number(profileData?.type) < type.value)
+  const filteredRoles: any = ROLE_SELECTS.filter((type) => Number(localProfile?.type) < type.value)
 
   useEffect(() => {
-    form.setFieldsValue({
-      title: data?.title,
-      email: data?.email,
-      type: data?.type,
-    })
+    if (data) {
+      form.setFieldsValue({
+        title: data?.title,
+        email: data?.email,
+        type: data?.type,
+      })
+    }
   }, [data, form, visible])
 
   const onFinish = (values: any) => {
@@ -42,7 +48,7 @@ const useAccountForm = ({ data, visible, setVisible }: Props = {}) => {
       id: data?.id,
     }
 
-    if (isOwner || isAdmin) {
+    if (isOwner || isAdmin || isAgent || isCustomer) {
       if (data) {
         const mutationPromise = updateMutation({
           account_id: data?.id,
@@ -52,7 +58,13 @@ const useAccountForm = ({ data, visible, setVisible }: Props = {}) => {
           .promise(mutationPromise, {
             loading: `updating account...`,
             success: `successfully updated`,
-            error: ({ data }) => data?.error,
+            error: (error) => {
+              if (error?.status == 'FETCH_ERROR') {
+                logOut()
+                return error?.error
+              }
+              return error?.data?.error
+            },
           })
           .then(() => {
             setVisible?.(false)
@@ -63,7 +75,13 @@ const useAccountForm = ({ data, visible, setVisible }: Props = {}) => {
           .promise(mutationPromise, {
             loading: `adding account...`,
             success: `successfully added`,
-            error: ({ data }) => data?.error,
+            error: (error) => {
+              if (error?.status == 'FETCH_ERROR') {
+                logOut()
+                return error?.error
+              }
+              return error?.data?.error
+            },
           })
           .then((res) => {
             setVisible?.(false)
@@ -76,12 +94,19 @@ const useAccountForm = ({ data, visible, setVisible }: Props = {}) => {
   }
 
   const accountForm = (
-    <Form onFinish={onFinish} form={form} layout="vertical">
+    <Form
+      onFinish={onFinish}
+      form={form}
+      layout="vertical"
+      initialValues={{
+        type: filteredRoles[0].value,
+      }}
+    >
       <Form.Item name="title" label="Full name:" rules={[{ required: true, message: 'full name is required' }]}>
         <FormElements.Input size="large" />
       </Form.Item>
 
-      <Form.Item name="email" label="Email:" rules={[{ required: true, message: 'email is required' }]}>
+      <Form.Item name="email" label="Email:" rules={[{ validator: validateEmail }]}>
         <FormElements.Input size="large" inputMode="email" />
       </Form.Item>
 
@@ -91,7 +116,7 @@ const useAccountForm = ({ data, visible, setVisible }: Props = {}) => {
         </Form.Item>
       )}
 
-      {profileData && (
+      {localProfile && (
         <Form.Item name="type" label="Choose a type:">
           <FormElements.Select options={filteredRoles} />
         </Form.Item>

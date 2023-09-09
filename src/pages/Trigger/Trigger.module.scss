@@ -3,3 +3,52 @@
 .formWrapper {
   margin-top: 16px;
 }
+.deviceRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  @media (max-width: $md) {
+    height: auto;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+.hookList {
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 50vh;
+  margin-bottom: 24px;
+
+  .devider {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 10;
+    margin: 16px 0;
+  }
+
+  &__item {
+    width: 97%;
+    margin: 10px auto !important;
+    height: 65px;
+    padding: 5px;
+    border-radius: $radius;
+    box-shadow: $shadowToDown;
+    display: flex;
+    justify-content: center !important;
+  }
+}
+
+.deviceRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  @media (max-width: $md) {
+    height: auto;
+    padding: 0;
+    justify-content: center;
+  }
+}

@@ -1,19 +1,21 @@
-import { FC, ReactNode, memo, useState } from 'react'
-import { Col, Empty, Row } from 'antd'
+import { FC, ReactNode, memo, useEffect, useState } from 'react'
+import { Col, Grid, Row } from 'antd'
 import toast from 'react-hot-toast'
 
 import { Button, List, Loader, NoData } from 'components'
-import { IAccountDTO } from 'types'
+import { IAccountDTO, IProfileDTO } from 'types'
 import { useAppSelector } from 'store/hooks'
 import { IListDataSource } from 'components/List/List'
 import { useGetRole } from 'hooks'
 import { ROLE_STEPS } from 'constants/common'
-import { useAccountsQuery, useDeleteAccountMutation, useProfileQuery } from 'store/endpoints'
+import { useAccountsQuery, useDeleteAccountMutation } from 'store/endpoints'
 import AddAccountModal from './_components/AddAccountModal'
 import UpdateAccountModal from './_components/UpdateAccountModal'
 
 import classes from './Accounts.module.scss'
 import { Plus } from 'tabler-icons-react'
+import { useLocalStorage } from 'react-use'
+import { logOut } from 'utils'
 
 type Props = {
   children?: ReactNode
@@ -25,30 +27,51 @@ const Accounts: FC<Props> = () => {
   const [selectedAccount, setSelectedAccount] = useState<IAccountDTO>()
   const { currentEdge } = useAppSelector((state) => state.navigation)
   const { isOwner, isAdmin, isAgent, isCustomer } = useGetRole()
+  const { useBreakpoint } = Grid
+  const { xs } = useBreakpoint()
 
-  const { data: profileData } = useProfileQuery()
-  const { data: accountsData, isSuccess } = useAccountsQuery({ edge_id: currentEdge?.id || 0, type: profileData?.type || 0 })
+  const [localProfile] = useLocalStorage<IProfileDTO>('profile')
+
+  const {
+    data: accountsData,
+    isSuccess,
+    error,
+  } = useAccountsQuery({
+    edge_id: currentEdge?.id || 0,
+    type: localProfile?.type || 0,
+  })
 
   const [deleteMutation] = useDeleteAccountMutation()
   const onDelete = () => {
-    if (isOwner || isAdmin) {
+    if (isOwner || isAdmin || isAgent || isCustomer) {
       const mutationPromise = deleteMutation({
         account_id: selectedAccount?.id,
       }).unwrap()
-
       toast.promise(mutationPromise, {
         loading: `deleting...`,
         success: `successfully deleted`,
-        error: ({ data }) => data?.error,
+        error: (error) => {
+          if (error?.status == 'FETCH_ERROR' || error?.status === 401) {
+            logOut()
+            return error?.error || error?.data?.error
+          }
+          return error?.data?.error
+        },
       })
     } else {
       toast.error('Permission denied!')
     }
   }
+  useEffect(() => {
+    let status = (error as any)?.status
+    if (status == 'FETCH_ERROR' || status === 401) {
+      logOut()
+    }
+  }, [error])
 
   const listData = accountsData?.map((account) => ({
     key: account.id,
-    avatar: account.title,
+    image: account.image,
     title: account.title,
     description: account.email,
     type: ROLE_STEPS[account.type],
@@ -57,19 +80,18 @@ const Accounts: FC<Props> = () => {
   })) as IListDataSource[]
 
   return (
-    <div className={`fade container`}>
-      <Row className="navigation" align="middle" justify="space-between">
+    <div className={`fade`}>
+      <Row className="navigation" align="middle" justify="space-between" wrap={false}>
         <Col>
           <Row align="middle" wrap={false}>
             <Col>
               <h2>Accounts</h2>
             </Col>
-
-            <Col>
-              <span className="navigationFoundText">
-                {accountsData?.length ? `Found ${accountsData?.length} Accounts` : 'No found Accounts'}
-              </span>
-            </Col>
+            {!xs && (
+              <Col>
+                <span className="navigationFoundText">{accountsData?.length ? `Found ${accountsData?.length} Accounts` : 'No found Accounts'}</span>
+              </Col>
+            )}
           </Row>
         </Col>
 
@@ -77,12 +99,7 @@ const Accounts: FC<Props> = () => {
           <Col>
             <Row justify="space-between" wrap={false}>
               <Col>
-                <Button
-                  icon={<Plus />}
-                  type="link"
-                  className="navigationAddButton"
-                  onClick={() => setAddAccountModal(true)}
-                >
+                <Button icon={<Plus />} type="link" className="navigationAddButton" onClick={() => setAddAccountModal(true)}>
                   Add
                 </Button>
               </Col>
@@ -106,9 +123,7 @@ const Accounts: FC<Props> = () => {
         )}
       </div>
       {addAccountModal && <AddAccountModal visible={addAccountModal} setVisible={setAddAccountModal} />}
-      {updateAccountModal && (
-        <UpdateAccountModal visible={updateAccountModal} setVisible={setUpdateAccountModal} data={selectedAccount} />
-      )}
+      {updateAccountModal && <UpdateAccountModal visible={updateAccountModal} setVisible={setUpdateAccountModal} data={selectedAccount} />}
     </div>
   )
 }

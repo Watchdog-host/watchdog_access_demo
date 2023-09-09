@@ -1,23 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/dist/query'
 
-import {
-  loginApi,
-  edgesApi,
-  accountApi,
-  watchlistApi,
-  identityApi,
-  descriptorApi,
-  devicesApi,
-  accessApi,
-  devicedeviceApi,
-  watchlistdeviceApi,
-  planApi,
-  paymentApi,
-} from './endpoints'
+import { loginApi, edgesApi, accountApi, watchlistApi, identityApi, devicesApi, accessApi, planApi, paymentApi, alertApi, revenueApi } from './endpoints'
 import navigationSlice from './slices/navigation'
-import layoutSlice from './slices/layout'
 import modalsSlice from './slices/modals'
+import dataSlice from './slices/data'
 
 const store = configureStore({
   reducer: {
@@ -26,16 +13,15 @@ const store = configureStore({
     [accountApi.reducerPath]: accountApi.reducer,
     [watchlistApi.reducerPath]: watchlistApi.reducer,
     [identityApi.reducerPath]: identityApi.reducer,
-    [descriptorApi.reducerPath]: descriptorApi.reducer,
     [devicesApi.reducerPath]: devicesApi.reducer,
-    [devicedeviceApi.reducerPath]: devicedeviceApi.reducer,
-    [watchlistdeviceApi.reducerPath]: watchlistdeviceApi.reducer,
     [accessApi.reducerPath]: accessApi.reducer,
     [planApi.reducerPath]: planApi.reducer,
     [paymentApi.reducerPath]: paymentApi.reducer,
+    [alertApi.reducerPath]: alertApi.reducer,
+    [revenueApi.reducerPath]: revenueApi.reducer,
     navigation: navigationSlice.reducer,
-    layout: layoutSlice.reducer,
     modals: modalsSlice.reducer,
+    datas: dataSlice.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -46,12 +32,11 @@ const store = configureStore({
       .concat(watchlistApi.middleware)
       .concat(identityApi.middleware)
       .concat(devicesApi.middleware)
-      .concat(devicedeviceApi.middleware)
-      .concat(watchlistdeviceApi.middleware)
-      .concat(descriptorApi.middleware)
       .concat(accessApi.middleware)
       .concat(planApi.middleware)
-      .concat(paymentApi.middleware),
+      .concat(paymentApi.middleware)
+      .concat(alertApi.middleware)
+      .concat(revenueApi.middleware),
 })
 
 setupListeners(store.dispatch)

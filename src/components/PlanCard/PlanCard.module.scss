@@ -1,7 +1,7 @@
 @import 'assets/scss/variables.scss';
 
 .card {
-  background-color: $gray;
+  // background-color: $gray;
   padding: 20px;
   border-radius: $radiusSm;
   position: relative;
@@ -30,7 +30,7 @@
     top: 7%;
     right: 7%;
     transform: rotate(90deg);
-    background-color: $gray !important;
+    // background-color: $gray !important;
   }
 
   .title {

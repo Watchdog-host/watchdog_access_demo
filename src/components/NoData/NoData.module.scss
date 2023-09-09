@@ -5,4 +5,14 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+
+  @media (max-width: $sm) {
+    top: 60%;
+    transform: translate(-50%, -60%);
+  }
+
+  @media (max-width: $xs) {
+    top: 70%;
+    transform: translate(-50%, -70%);
+  }
 }

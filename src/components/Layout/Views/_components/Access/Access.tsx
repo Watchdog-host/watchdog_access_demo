@@ -1,93 +1,96 @@
-import { FC, ReactNode, useState } from 'react'
+import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
 
 import classes from './Access.module.scss'
-import { Col, Grid, Row } from 'antd'
-import { DeviceCard, FormElements, Loader, NoData } from 'components'
-import { useDevicesQuery } from 'store/endpoints'
+import { Col, Form, Grid, Row } from 'antd'
+import { Button, DeviceCard, Loader, NoData } from 'components'
+import { useLazyDevicesQuery } from 'store/endpoints'
 import { useAppSelector } from 'store/hooks'
-import { groupBy, map } from 'lodash'
-import { DeviceTypeEnum } from 'constants/enums'
-import { IGroupOptions } from 'types'
+import { AccountTypeEnum } from 'constants/enums'
+import { IProfileDTO } from 'types'
 import AccessCard from './_components/AccessCard'
 import cn from 'classnames'
 import { isCurrentPath } from 'utils'
 import useGetAccessWs from './_hooks/useGetAccessWs'
+import { useLocalStorage } from 'react-use'
+import { Settings } from 'tabler-icons-react'
+import SettingsModal from './_components/SettingsModal'
 
 type Props = {
   children?: ReactNode
 }
 
 const Access: FC<Props> = () => {
-  const [selectValue, setSelectValue] = useState<number[]>([])
+  const [form] = Form.useForm()
+  const [settingsModal, setSettingsModal] = useState<boolean>(false)
+  const isAccess = isCurrentPath(['Access'])
+  const [localProfile] = useLocalStorage<IProfileDTO>('profile')
 
   const { useBreakpoint } = Grid
-  const { lg, xxl, md, xl, xs } = useBreakpoint()
+  const { xs } = useBreakpoint()
   const { currentEdge } = useAppSelector((state) => state.navigation)
-  const { data: devicesByIdQuery, isSuccess } = useDevicesQuery({
-    filter: { edge_id: currentEdge?.id, id: selectValue.length ? selectValue : [0] },
-  })
-  const allDevicesQuery = useDevicesQuery({ filter: { edge_id: currentEdge?.id || 0} })
 
-  const devicesData = allDevicesQuery.data
-  const groupedOptions = groupBy(devicesData, 'type')
-  const deviceOptions = map(groupedOptions, (data, key) => {
-    return {
-      label: DeviceTypeEnum[key as any],
-      options: data?.map((device) => ({
-        title: device.title,
-        value: device.id,
-      })),
+  const [storageData, setStorageData] = useLocalStorage('access')
+
+  const stagedSelectValue = useMemo(() => {
+    if (currentEdge && storageData && (storageData as any)[currentEdge.id]) {
+      return (storageData as any)[currentEdge.id] as number[]
     }
-  }) as IGroupOptions[]
+    return []
+  }, [storageData, currentEdge])
 
-  const isAccess = isCurrentPath(['Access'])
+  const { data: accessDataWs } = useGetAccessWs({
+    device_ids: stagedSelectValue,
+    verified_only: false,
+    skip_image: false,
+  })
 
-  const { data: accessDataWs } = useGetAccessWs({ device_ids: selectValue, verified_only: false, skip_image: false })
+  const [getLazyDevices, { data: lazyDevicesData, isSuccess }] = useLazyDevicesQuery()
+
+  useEffect(() => {
+    if (currentEdge) {
+      const edgeId = currentEdge.id
+      const storedData = storageData && (storageData as any)[edgeId]
+      getLazyDevices({
+        filter: { edge_id: edgeId || 0, id: storedData?.length ? [...storedData] : [0] },
+      })
+    }
+  }, [storageData, currentEdge])
 
   return (
-    <div className={`fade container`}>
-      <Row className={cn('navigation', { [classes.isAccess]: !isAccess })} align="middle" justify="space-between">
+    <div className={`fade`}>
+      <Row className={'navigation'} align="middle" justify="space-between">
         <Col>
           <Row align="middle" wrap={false}>
             <Col>
               <h2>Access</h2>
             </Col>
-
             <Col>
-              <span className={'navigationFoundText'}>
-                {devicesByIdQuery?.length ? `Found ${devicesByIdQuery?.length} Access` : 'No found Devices'}
-              </span>
+              <span className={'navigationFoundText'}>{lazyDevicesData?.length ? `Found ${lazyDevicesData?.length} Devices` : 'No found Devices'}</span>
             </Col>
           </Row>
         </Col>
-        <Col span={!isAccess ? 6 : xs ? 8 : 4}>
-          <FormElements.Select
-            maxTagCount={1}
-            placeholder={'Select devices'}
-            mode="multiple"
-            onChange={(value) => setSelectValue(value)}
-            groupOptions={deviceOptions}
-            size="large"
-          />
+        <Col>
+          <Button className={classes.settingBtn} icon={<Settings />} type="link" onClick={() => setSettingsModal(true)}>
+            {!xs && 'Settings'}
+          </Button>
         </Col>
       </Row>
-      <div className={cn(classes.dataWrapper, { [classes.isAccess]: isAccess && lg })}>
+      <div className={cn(classes.dataWrapper, { [classes.isAccess]: isAccess })}>
         {isAccess && (
           <section className={classes.devices}>
             {!isSuccess ? (
               <Loader />
-            ) : devicesByIdQuery?.length ? (
-              <Row gutter={[16, 16]} style={{ paddingBottom: 16 }}>
-                {devicesByIdQuery?.map((device) => (
-                  <Col span={xxl ? 8 : md ? 12 : 24} key={device.id}>
-                    <DeviceCard
-                      data={device}
-                      title={device?.title}
-                      setDescriptorModal={()=>{}}
-                    />
-                  </Col>
+            ) : lazyDevicesData?.length ? (
+              <div className={classes.deviceRow}>
+                {lazyDevicesData?.map((device) => (
+                  <DeviceCard
+                    key={device.id}
+                    role_policy={AccountTypeEnum.Viewer >= (localProfile ? localProfile?.type : AccountTypeEnum.Owner)}
+                    data={device}
+                    title={device?.title}
+                  />
                 ))}
-              </Row>
+              </div>
             ) : (
               <NoData />
             )}
@@ -97,14 +100,17 @@ const Access: FC<Props> = () => {
           {accessDataWs?.length ? (
             <Row gutter={[12, 12]}>
               {accessDataWs?.map((access) => (
-                <Col span={24} key={access?.id} className={'fade'}>
+                <Col span={24} key={access?.id} className="fade">
                   <AccessCard data={access} />
                 </Col>
               ))}
             </Row>
-          ) : null}
+          ) : (
+            <NoData />
+          )}
         </section>
       </div>
+      {settingsModal && <SettingsModal setStorageData={setStorageData} storageData={storageData} visible={settingsModal} setVisible={setSettingsModal} />}
     </div>
   )
 }

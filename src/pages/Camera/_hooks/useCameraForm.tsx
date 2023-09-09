@@ -1,36 +1,28 @@
 import React, { useEffect, useState } from 'react'
-import { Checkbox, Col, Form, Row, InputNumber, Tabs, Divider } from 'antd'
+import { Checkbox, Col, Form, Row, Divider, InputNumber, Grid, Select } from 'antd'
 import { groupBy, map, upperFirst } from 'lodash'
 import { toast } from 'react-hot-toast'
 import _ from 'lodash'
-import { Button, FormElements, List } from 'components'
+import { Button, FormElements, List, Tabs } from 'components'
 import { useAppSelector } from 'store/hooks'
+import { useAddDeviceMutation, useDevicesQuery, useUpdateDeviceMutation, useWatchlistsQuery } from 'store/endpoints'
 import {
-  useAddDeviceMutation,
-  useAddDevicedeviceMutation,
-  useAddWatchlistdeviceMutation,
-  useDeleteDevicedeviceMutation,
-  useDeleteWatchlistdeviceMutation,
-  useDevicedeviceQuery,
-  useDevicesQuery,
-  useUpdateDeviceMutation,
-  useUpdateWatchlistdeviceMutation,
-  useWatchlistdeviceQuery,
-  useWatchlistsQuery,
-} from 'store/endpoints'
-import {
-  ACCESS_SELECTS,
+  GRANT_SELECTS,
   ALERT_SELECTS,
   ENHANCEMENT_SELECTS,
   DEVICE_SELECTS,
   CAMERA_MODEL_SELECTS,
-  DIRECTION_SELECTS,
+  ACCESS_TYPE_SELECTS,
   DESCRIPTOR_TYPE_SELECT,
+  BARCODE_FORMATS_SELECTS,
+  BARCODE_BINARIZER,
 } from 'constants/common'
 import { IDeviceDTO, IGroupOptions, IWatchlistdevice } from 'types'
 import { useGetRole } from 'hooks'
 import classes from '../Camera.module.scss'
-import { DescriptorTypeEnum, DeviceTypeEnum } from 'constants/enums'
+import { AccessTypeEnum, AlertTypeEnum, BarcodeBinarizerEnum, DescriptorTypeEnum, DeviceModelEnum, DeviceTypeEnum, GrantTypeEnum } from 'constants/enums'
+import { floatPercentage, logOut, validateBufferSize, validateDetectionIterationIncrease, validateFps, validateFrameHW, validateMinFontSize } from 'utils'
+import { createWatchlistObject, fromWatchlistObject } from 'utils/data'
 
 export type Props = {
   data?: IDeviceDTO
@@ -41,36 +33,22 @@ export type Props = {
 const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
   const [form] = Form.useForm()
   const [watchlists, setWatchlists] = useState<any[]>()
-
-  const [deletedOutputs, setDeletedOutputs] = useState<any[]>([])
-  const [newOutputs, setNewOutputs] = useState<any[]>([])
-
-  const [newWatchlistdevice, setNewWatchlistdevice] = useState<IWatchlistdevice[]>([])
-  const [deletedWatchlistdevice, setDeletedWatchlistdevice] = useState<IWatchlistdevice[]>([])
-  const [updatedWatchlistdevice, setUpdatedWatchlistdevice] = useState<IWatchlistdevice[]>([])
-
+  const { useBreakpoint } = Grid
+  const { xs } = useBreakpoint()
   const [descriptorType, setDescriptorType] = useState<number>(DescriptorTypeEnum.Barcode)
   const { currentEdge } = useAppSelector((state) => state.navigation)
-  const { isOwner, isAdmin } = useGetRole()
+  const { isOwner, isAdmin, isAgent, isCustomer } = useGetRole()
 
   const [addDeviceMutation, { isLoading: isAddDeviceLoading }] = useAddDeviceMutation()
   const [updateDeviceMutation, { isLoading: updateLoading }] = useUpdateDeviceMutation()
 
-  const [addDevicedeviceMutation] = useAddDevicedeviceMutation()
-  const [deleteDevicedeviceMutation] = useDeleteDevicedeviceMutation()
-
-  const [addWatchlistdeviceMutation] = useAddWatchlistdeviceMutation()
-
-  const [deleteWatchlistdeviceMutation] = useDeleteWatchlistdeviceMutation()
-  const [updateWatchlistdeviceMutation] = useUpdateWatchlistdeviceMutation()
-
-  const devicedeviceQuery = useDevicedeviceQuery({ input_device_id: data?.id || 0 })
-  const watchlistdeviceQuery = useWatchlistdeviceQuery({ device_id: data?.id || 0 })
-
-  const watchlistsQuery = useWatchlistsQuery()
-  const devicesQuery = useDevicesQuery({ filter: { edge_id: currentEdge?.id } })
-
+  const watchlistsQuery = useWatchlistsQuery({
+    filter: {
+      id: currentEdge?.id || 0,
+    },
+  })
   const watchlistsData = watchlistsQuery.data
+  const devicesQuery = useDevicesQuery({ filter: { edge_id: currentEdge?.id || 0 } })
   const devicesData = devicesQuery.data
   const groupedOptions = groupBy(devicesData, 'type')
   const deviceOptions = map(groupedOptions, (data, key) => {
@@ -83,52 +61,31 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
     }
   }) as IGroupOptions[]
 
-  function handleSetUpdatedOutputs(action: 'delete' | 'select', value: number) {
-    if (action === 'delete') {
-      if (
-        deletedOutputs.indexOf(value) === -1 &&
-        devicedeviceQuery.data?.some((item) => item.output_device_id === value)
-      ) {
-        setDeletedOutputs((prev) => [...prev, value])
-      } else {
-        setNewOutputs((prev) => prev.filter((item) => item !== value))
-      }
-    } else {
-      if (!devicedeviceQuery.data?.some((item) => item.output_device_id === value)) {
-        setNewOutputs((prev) => [...prev, value])
-      } else {
-        setDeletedOutputs((prev) => prev.filter((item) => item !== value))
-      }
-    }
-  }
-
   useEffect(() => {
+    const extra_field = JSON.parse(data?.extra_field || '{}')
     setWatchlists(
       watchlistsData?.map((watchlist) => ({
         label: watchlist.title,
         data: watchlist.watchlists?.map((item) => {
-          const data = watchlistdeviceQuery.data?.find(({ watchlist_id }) => watchlist_id === item.id)
+          const data = fromWatchlistObject(extra_field?.watchlists)?.find(({ watchlist_id }) => watchlist_id === item.id)
           return {
             title: item.title,
             watchlist_id: item.id,
             active: Boolean(data) || item.title === 'Unknown',
-            alert_type: data?.alert_type || 0,
-            grant_type: data?.grant_type || 0,
+            //xaxa
+            alert_type: data?.alert_type ?? null,
+            grant_type: data?.grant_type ?? null,
           }
         }),
       })),
     )
-  }, [watchlistsQuery.isFetching, watchlistdeviceQuery.isFetching])
+  }, [data, watchlistsQuery.isFetching, visible])
 
   useEffect(() => {
     if (data) {
-      const parsed = JSON.parse(data?.extra_field || '{}')
-
-      const resOutput = devicedeviceQuery.data?.map((device) => ({
-        title: devicesQuery.data?.find(({ id }) => id === device.output_device_id)?.title,
-        value: device.output_device_id,
-      }))
-
+      const extra_field = JSON.parse(data?.extra_field || '{}')
+      const resOutput = extra_field?.output_devices?.map((value: number) => value).filter((id: number) => devicesData?.find((item) => item.id === id))
+      setDescriptorType(extra_field?.descriptor_type)
       form.setFieldsValue({
         title: data?.title,
         model: data?.model,
@@ -136,146 +93,106 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
         access_type: data?.access_type,
         longitude: data?.longitude,
         latitude: data?.latitude,
-        output: resOutput,
+        output_devices: resOutput,
 
-        descriptor_type: parsed?.descriptor_type,
-        enhancement: parsed?.enhancement,
-        fps: parsed?.fps,
-        buffer_size: parsed?.buffer_size,
-        frame_width: parsed?.frame_width,
-        frame_height: parsed?.frame_height,
+        descriptor_type: extra_field?.descriptor_type,
+        enhancement: extra_field?.enhancement,
+        fps: extra_field?.fps,
+        buffer_size: extra_field?.buffer_size,
+        frame_width: extra_field?.frame_width,
+        frame_height: extra_field?.frame_height,
 
-        detection_iteration_increase: parsed?.detection_iteration_increase,
-        verification_threshold: parsed?.verification_threshold,
-        ocr_min_font_point: parsed?.ocr_min_font_point,
-        postprocess_min_confidence: parsed?.postprocess_min_confidence,
-        postprocess_confidence_skip_level: parsed?.postprocess_confidence_skip_level,
+        barcode_formats: extra_field?.barcode_formats?.split(','),
+        barcode_is_pure: extra_field?.barcode_is_pure,
+        barcode_try_harder: extra_field?.barcode_try_harder,
+        barcode_try_rotate: extra_field?.barcode_try_rotate,
+        barcode_try_invert: extra_field?.barcode_try_invert,
+        barcode_try_downscale: extra_field?.barcode_try_downscale,
+        barcode_binarizer: extra_field?.barcode_binarizer,
+
+        detection_iteration_increase: extra_field?.detection_iteration_increase,
+        verification_threshold: extra_field?.verification_threshold,
+        ocr_min_font_point: extra_field?.ocr_min_font_point,
+        postprocess_min_confidence: extra_field?.postprocess_min_confidence,
+        postprocess_confidence_skip_level: extra_field?.postprocess_confidence_skip_level,
       })
     }
-  }, [data, form, visible, devicedeviceQuery.isFetching])
+  }, [data, form, visible, devicesQuery.isSuccess])
 
   const onFinish = (values: any) => {
-    const camera_extra_field = {
-      descriptor_type: values.descriptor_type || DescriptorTypeEnum.Barcode,
-      enhancement: values.enhancement,
+    const extra_field = {
+      output_devices: values.output_devices,
+      watchlists: createWatchlistObject(watchlists?.map((item) => item.data && item.data).flat() as IWatchlistdevice[]),
+
+      descriptor_type: values.descriptor_type ?? null,
+      enhancement: values.enhancement ?? null,
       fps: values.fps,
       buffer_size: values.buffer_size,
       frame_width: values.frame_width,
       frame_height: values.frame_height,
 
-      detection_iteration_increase: values.detection_iteration_increase,
-      verification_threshold: values.verification_threshold,
-      ocr_min_font_point: values.ocr_min_font_point,
-      postprocess_min_confidence: values.postprocess_min_confidence,
-      postprocess_confidence_skip_level: values.postprocess_confidence_skip_level,
+      barcode_formats: values.barcode_formats?.join(','),
+      barcode_is_pure: values.barcode_is_pure,
+      barcode_try_harder: values.barcode_try_harder,
+      barcode_try_rotate: values.barcode_try_rotate,
+      barcode_try_invert: values.barcode_try_invert,
+      barcode_try_downscale: values.barcode_try_downscale,
+      barcode_binarizer: values.barcode_binarizer,
+
+      detection_iteration_increase: values.detection_iteration_increase ?? undefined,
+      verification_threshold: values.verification_threshold ?? undefined,
+      ocr_min_font_point: values.ocr_min_font_point ?? undefined,
+      postprocess_min_confidence: values.postprocess_min_confidence ?? undefined,
+      postprocess_confidence_skip_level: values.postprocess_confidence_skip_level ?? undefined,
     }
+
     const formData = {
       id: data?.id,
       type: DeviceTypeEnum.Camera,
       title: values.title,
-      model: values.model || 0,
+      model: values.model,
       source: values.source,
-      access_type: values.access_type || 0,
-      latitude: Number(values.latitude),
-      longitude: Number(values.longitude),
+      access_type: values.access_type ?? null,
+      latitude: values.latitude,
+      longitude: values.longitude,
       edge_id: currentEdge?.id,
-      extra_field: JSON.stringify(camera_extra_field),
+      extra_field: JSON.stringify(extra_field),
     }
 
-    const watchlistdeviceData = (
-      watchlists
-        ?.map((item) => Object.values(item))
-        .flat()
-        .filter((item) => Array.isArray(item))
-        .flat() as IWatchlistdevice[]
-    )
-      ?.filter((item) => item.active)
-      .map(({ watchlist_id, alert_type, grant_type }) => ({ watchlist_id, alert_type, grant_type }))
-
-    if (isOwner || isAdmin) {
+    if (isOwner || isAdmin || isAgent || isCustomer) {
       if (data) {
         const mutationPromise = updateDeviceMutation({
           ...formData,
           device_id: data?.id,
-        })
-          .unwrap()
-          .then(() => {
-            if (deletedOutputs?.length) {
-              for (let i = 0; i < deletedOutputs?.length; i++) {
-                const id = devicedeviceQuery.data?.find((item) => item.output_device_id === deletedOutputs[i])?.id
-                deleteDevicedeviceMutation({ id }).unwrap()
-              }
-            }
-            if (newOutputs?.length) {
-              for (let i = 0; i < newOutputs?.length; i++) {
-                const output_device_id = newOutputs[i]
-                addDevicedeviceMutation({ input_device_id: data?.id, output_device_id }).unwrap()
-              }
-            }
-            if (newWatchlistdevice.length) {
-              for (let i = 0; i < newWatchlistdevice.length; i++) {
-                const { alert_type, grant_type, watchlist_id } = newWatchlistdevice[i]
-                addWatchlistdeviceMutation({
-                  alert_type,
-                  grant_type,
-                  watchlist_id,
-                  device_id: data?.id,
-                })
-              }
-            }
-            if (watchlistdeviceQuery.isSuccess) {
-              if (deletedWatchlistdevice.length) {
-                for (let i = 0; i < deletedWatchlistdevice.length; i++) {
-                  const watchlistId = watchlistdeviceQuery.data?.find(
-                    ({ watchlist_id }) => watchlist_id === deletedWatchlistdevice[i]?.watchlist_id,
-                  )?.id
-                  deleteWatchlistdeviceMutation({ id: watchlistId })
-                }
-              }
-              if (updatedWatchlistdevice.length) {
-                for (let i = 0; i < updatedWatchlistdevice.length; i++) {
-                  const watchlistdevice_id = watchlistdeviceQuery.data.find(
-                    ({ watchlist_id }) => watchlist_id === updatedWatchlistdevice[i]?.watchlist_id,
-                  )?.id
-                  const { alert_type, grant_type } = updatedWatchlistdevice[i]
-                  updateWatchlistdeviceMutation({
-                    ...{ id: watchlistdevice_id, alert_type, grant_type },
-                    watchlistdevice_id,
-                  })
-                }
-              }
-            }
-          })
+        }).unwrap()
         toast
           .promise(mutationPromise, {
             loading: `updating device...`,
             success: `successfully updated`,
-            error: ({ data }) => data?.error,
+            error: (error) => {
+              if (error?.status == 'FETCH_ERROR' || error?.status === 401) {
+                logOut()
+                return error?.error || error?.data?.error
+              }
+              return error?.data?.error
+            },
           })
           .then(() => {
             setVisible?.(false)
           })
       } else {
-        const mutationPromise = addDeviceMutation(formData)
-          .unwrap()
-          .then((res) => {
-            if (values.output?.length) {
-              for (let i = 0; i < values.output?.length; i++) {
-                const output_device_id = values.output[i]
-                addDevicedeviceMutation({ input_device_id: res.id, output_device_id }).unwrap()
-              }
-            }
-            if (watchlistdeviceData?.length) {
-              for (let i = 0; i < watchlistdeviceData?.length; i++) {
-                addWatchlistdeviceMutation({ ...watchlistdeviceData[i], device_id: res.id })
-              }
-            }
-          })
+        const mutationPromise = addDeviceMutation(formData).unwrap()
         toast
           .promise(mutationPromise, {
             loading: `adding device...`,
             success: `successfully added`,
-            error: ({ data }) => data?.error,
+            error: (error) => {
+              if (error?.status == 'FETCH_ERROR' || error?.status === 401) {
+                logOut()
+                return error?.error || error?.data?.error
+              }
+              return error?.data?.error
+            },
           })
           .then(() => {
             setVisible?.(false)
@@ -284,40 +201,6 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
       }
     } else {
       toast.error('Permission denied!')
-    }
-  }
-
-  const handleWatchlistdeviceState = (value: IWatchlistdevice) => {
-    if (watchlistdeviceQuery.isSuccess) {
-      const isExisting = watchlistdeviceQuery.data.some((item) => item.watchlist_id === value.watchlist_id)
-      const updatedItem = watchlistdeviceQuery.data.find(
-        ({ alert_type, grant_type, watchlist_id }) =>
-          watchlist_id === value.watchlist_id && (alert_type !== value.alert_type || grant_type !== value.grant_type),
-      )
-      if (!isExisting) {
-        if (value.active) {
-          setNewWatchlistdevice((prev) => [...prev.filter((item) => item.watchlist_id !== value.watchlist_id), value])
-        } else {
-          setNewWatchlistdevice((prev) => prev?.filter((item) => item.watchlist_id !== value.watchlist_id))
-        }
-      } else {
-        if (value.active) {
-          setDeletedWatchlistdevice((prev) => prev?.filter((item) => item.watchlist_id !== value.watchlist_id))
-        } else {
-          setDeletedWatchlistdevice((prev) => [
-            ...prev.filter((item) => item.watchlist_id !== value.watchlist_id),
-            value,
-          ])
-        }
-      }
-      if (updatedItem) {
-        setUpdatedWatchlistdevice((prev) => [
-          ...prev.filter((item) => item?.watchlist_id !== value?.watchlist_id),
-          value,
-        ])
-      } else {
-        setUpdatedWatchlistdevice((prev) => prev?.filter((item) => item.watchlist_id !== value.watchlist_id))
-      }
     }
   }
 
@@ -333,7 +216,6 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
           } else if (type === 'grant_type') {
             item.grant_type = value
           }
-          handleWatchlistdeviceState(item)
         }
       })
       return { ...watchlist, data: newArr }
@@ -346,32 +228,31 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
     label: 'Plate',
     children: (
       <section className={classes.formWrapper}>
-        <Row gutter={12}>
+        <Row gutter={xs ? 8 : 12}>
           <Col span={12}>
             <Form.Item name="detection_iteration_increase" label="Detection iteration:">
-              <InputNumber size="large" placeholder="e.g., 1.10" min={0.01} max={1} step={0.05} />
+              <FormElements.InputNumber size="large" placeholder="e.g., 1.10" min={1} max={2} precision={2} step={0.05} float />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item name="verification_threshold" label="Verification threshold:">
-              <InputNumber size="large" placeholder="e.g., 75" min={1} />
+              <FormElements.InputNumber size="large" placeholder="e.g., 75" min={0} max={100} precision={2} float />
             </Form.Item>
           </Col>
         </Row>
-
         <Form.Item name="ocr_min_font_point" label="Minimum font size:">
-          <InputNumber size="large" placeholder="e.g., 6" min={1} max={100} />
+          <FormElements.InputNumber size="large" placeholder="e.g., 6" min={0} max={100} />
         </Form.Item>
 
-        <Row gutter={12}>
+        <Row gutter={xs ? 8 : 12}>
           <Col span={12}>
             <Form.Item name="postprocess_min_confidence" label="Char OCR confidence (%):">
-              <InputNumber size="large" placeholder="e.g., 75" min={0} max={100} />
+              <FormElements.InputNumber size="large" placeholder="e.g., 75" min={0} max={100} precision={2} float />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item name="postprocess_confidence_skip_level" label="Total OCR confidence (%):">
-              <InputNumber size="large" placeholder="e.g., 75" min={0} max={100} />
+              <FormElements.InputNumber size="large" placeholder="e.g., 75" min={0} max={100} precision={2} float />
             </Form.Item>
           </Col>
         </Row>
@@ -384,8 +265,46 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
     label: 'Barcode',
     children: (
       <section className={classes.formWrapper}>
-        <Row gutter={12}>
-          <Col span={12}>I'm Barcode form</Col>
+        <Row gutter={xs ? 8 : 12}>
+          <Col span={12}>
+            <Form.Item name="barcode_formats" label="Formats:">
+              <FormElements.Select mode="multiple" options={BARCODE_FORMATS_SELECTS} size="large" maxTagCount={'responsive'} placeholder="All formats are selected if empty" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item name="barcode_binarizer" label="Binarizer:">
+              <FormElements.Select options={BARCODE_BINARIZER} />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={8}>
+            <Form.Item name="barcode_is_pure" valuePropName="checked" wrapperCol={{ offset: 1, span: 2 }}>
+              <Checkbox>Is pure</Checkbox>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item name="barcode_try_harder" valuePropName="checked" wrapperCol={{ offset: 1, span: 2 }}>
+              <Checkbox>Try harder</Checkbox>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item name="barcode_try_rotate" valuePropName="checked" wrapperCol={{ offset: 0, span: 2 }}>
+              <Checkbox>Try rotate</Checkbox>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={8}>
+            <Form.Item name="barcode_try_invert" valuePropName="checked" wrapperCol={{ offset: 1, span: 2 }}>
+              <Checkbox>Try invert</Checkbox>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item name="barcode_try_downscale" valuePropName="checked" wrapperCol={{ offset: 1, span: 2 }}>
+              <Checkbox>Try downscale</Checkbox>
+            </Form.Item>
+          </Col>
         </Row>
       </section>
     ),
@@ -395,7 +314,7 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
     label: 'Face',
     children: (
       <section className={classes.formWrapper}>
-        <Row gutter={12}>
+        <Row gutter={xs ? 8 : 12}>
           <Col span={12}>I'm Face form</Col>
         </Row>
       </section>
@@ -408,7 +327,7 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
       label: 'General',
       children: (
         <section className={classes.formWrapper}>
-          <Row gutter={12}>
+          <Row gutter={xs ? 8 : 12}>
             <Col span={12}>
               <Form.Item name="title" label="Title:" rules={[{ required: true, message: 'title is required' }]}>
                 <FormElements.Input size="large" placeholder="e.g., Outdoor device" />
@@ -424,41 +343,27 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
           <Form.Item name="source" label="Source:" rules={[{ required: true, message: 'source is required' }]}>
             <FormElements.Input size="large" placeholder="e.g., <http://>, <rtsp://>, <webcam>, ..." />
           </Form.Item>
-          <Row gutter={12}>
+          <Row gutter={xs ? 8 : 12}>
             <Col span={24}>
               <Form.Item name="access_type" label="Access type:">
-                <FormElements.Select options={DIRECTION_SELECTS} />
+                <FormElements.Select allowClear options={ACCESS_TYPE_SELECTS} />
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={12}>
+          <Row gutter={xs ? 8 : 12}>
             <Col span={12}>
-              <Form.Item
-                name="latitude"
-                label="Latitude:"
-                rules={[{ required: true, message: 'latitude type is required' }]}
-              >
-                <FormElements.Input size="large" />
+              <Form.Item name="latitude" label="Latitude:" rules={[{ required: true, message: 'Latitude is required' }]}>
+                <FormElements.InputNumber size="large" placeholder="e.g., 41.248902" min={0} float />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="longitude"
-                label="Longitude:"
-                rules={[{ required: true, message: 'longitude type is required' }]}
-              >
-                <FormElements.Input size="large" />
+              <Form.Item name="longitude" label="Longitude:" rules={[{ required: true, message: 'Longitude is required' }]}>
+                <FormElements.InputNumber size="large" placeholder="e.g., 69.166554" min={0} float />
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item name="output" label="Output:">
-            <FormElements.Select
-              mode="multiple"
-              onSelect={(value) => handleSetUpdatedOutputs('select', value)}
-              onDeselect={(value) => handleSetUpdatedOutputs('delete', value)}
-              groupOptions={deviceOptions}
-              size="large"
-            />
+          <Form.Item name="output_devices" label="Output:">
+            <FormElements.Select mode="multiple" groupOptions={deviceOptions} size="large" maxTagCount={'responsive'} />
           </Form.Item>
         </section>
       ),
@@ -468,39 +373,39 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
       label: 'Frame',
       children: (
         <section className={classes.formWrapper}>
-          <Row gutter={12} align="middle">
+          <Row gutter={xs ? 8 : 12}>
             <Col span={24}>
-              <Row gutter={12}>
+              <Row gutter={xs ? 8 : 12}>
                 <Col span={12}>
                   <Form.Item name="descriptor_type" label="Descriptor type:">
-                    <FormElements.Select onSelect={(e) => setDescriptorType(e)} options={DESCRIPTOR_TYPE_SELECT} />
+                    <FormElements.Select allowClear onSelect={(e) => setDescriptorType(e)} options={DESCRIPTOR_TYPE_SELECT} />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item name="enhancement" label="Enhancement:">
-                    <FormElements.Select options={ENHANCEMENT_SELECTS} />
+                    <FormElements.Select allowClear options={ENHANCEMENT_SELECTS} />
                   </Form.Item>
                 </Col>
               </Row>
             </Col>
             <Col span={12}>
-              <Form.Item name="fps" label="Fps:">
-                <InputNumber size="large" placeholder="e.g., 25" min={0} max={1000} />
+              <Form.Item name="fps" label="FPS:" rules={[{ validator: validateFps }]}>
+                <FormElements.InputNumber min={0} max={1000} size="large" placeholder="e.g., 25" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="buffer_size" label="Buffer size:">
-                <InputNumber size="large" placeholder="e.g., 5" min={0} max={1000} />
+              <Form.Item name="buffer_size" label="Buffer size:" rules={[{ validator: validateBufferSize }]}>
+                <FormElements.InputNumber min={0} max={100} size="large" placeholder="e.g., 5" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="frame_width" label="Frame width:">
-                <InputNumber size="large" placeholder="e.g., 0" min={0} />
+              <Form.Item name="frame_width" label="Frame width:" rules={[{ validator: validateFrameHW }]}>
+                <FormElements.InputNumber min={0} max={10000} size="large" placeholder="e.g., 1280" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="frame_height" label="Frame height:">
-                <InputNumber size="large" placeholder="e.g., 0" min={0} />
+              <Form.Item name="frame_height" label="Frame height:" rules={[{ validator: validateFrameHW }]}>
+                <FormElements.InputNumber min={0} max={10000} size="large" placeholder="e.g., 720" />
               </Form.Item>
             </Col>
           </Row>
@@ -512,64 +417,68 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
       label: 'Watchlists',
       children: (
         <div className={classes.hookList}>
-          {watchlists?.map(({ label, data }) => (
-            <div key={label}>
-              <Divider className={classes.devider} orientation="center">
-                {_.upperFirst(label)}
-              </Divider>
-              {data?.map((item: IWatchlistdevice) => (
-                <Row
-                  key={item.title}
-                  align="middle"
-                  justify="space-between"
-                  gutter={12}
-                  className={classes.hookList__item}
-                  wrap={false}
-                >
-                  <Col span={6}>
-                    <Row gutter={12} wrap={false}>
-                      <Col>
-                        <Checkbox
-                          checked={item.active}
-                          onChange={(e) => {
-                            const { checked } = e.target
-                            onChanges(item.watchlist_id, 'check', checked)
-                          }}
-                        />
-                      </Col>
-                      <Col>
-                        <b>{_.upperFirst(item.title)}</b>
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col span={18}>
-                    <Row gutter={12} justify={'end'}>
-                      <Col span={8}>
-                        <FormElements.Select
-                          fullWidth
-                          placeholder="Select alert"
-                          options={ALERT_SELECTS}
-                          disabled={!item.active}
-                          value={item.alert_type}
-                          onChange={(e) => onChanges(item.watchlist_id, 'alert_type', e)}
-                        />
-                      </Col>
-                      <Col span={8}>
-                        <FormElements.Select
-                          fullWidth
-                          placeholder="Select access"
-                          options={ACCESS_SELECTS}
-                          disabled={!item.active}
-                          value={item.grant_type}
-                          onChange={(e) => onChanges(item.watchlist_id, 'grant_type', e)}
-                        />
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
-              ))}
-            </div>
-          ))}
+          {watchlists?.map(({ label, data }) => {
+            if (!data?.length) return
+            return (
+              <div key={label}>
+                <Divider className={classes.devider} orientation="center">
+                  {_.upperFirst(label)}
+                </Divider>
+                {data?.map(({ title, active, alert_type, grant_type, watchlist_id }: IWatchlistdevice) => (
+                  <Row key={title} align="middle" justify="space-between" gutter={xs ? 8 : 12} className={classes.hookList__item} wrap={false}>
+                    <Col span={6}>
+                      <Row gutter={xs ? 8 : 12} wrap={false}>
+                        <Col>
+                          <Checkbox
+                            checked={active}
+                            onChange={(e) => {
+                              const { checked } = e.target
+                              onChanges(watchlist_id, 'check', checked)
+                            }}
+                          />
+                        </Col>
+                        <Col style={{ whiteSpace: 'nowrap' }}>
+                          <b>{_.upperFirst(title)}</b>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col span={18}>
+                      <Row gutter={xs ? 8 : 12} justify={'end'}>
+                        <Col span={xs ? 10 : 8}>
+                          {/* <Form.Item name={'a'}> */}
+                          <FormElements.Select
+                            allowClear
+                            fullWidth
+                            placeholder="Select alert"
+                            options={ALERT_SELECTS}
+                            // defaultValue={ALERT_SELECTS[AlertTypeEnum.None].value}
+                            disabled={!active}
+                            value={alert_type}
+                            onChange={(e) => onChanges(watchlist_id, 'alert_type', e)}
+                          />
+                          {/* </Form.Item> */}
+                        </Col>
+                        <Col span={xs ? 10 : 8}>
+                          {/* <Form.Item name={'b'}> */}
+                          <FormElements.Select
+                            allowClear
+                            fullWidth
+                            placeholder="Select access"
+                            options={GRANT_SELECTS}
+                            // defaultValue={GRANT_SELECTS[GrantTypeEnum.Undefined].value}
+                            disabled={!active}
+                            value={grant_type}
+                            onChange={(e) => onChanges(watchlist_id, 'grant_type', e)}
+                          />
+                          {/* </Form.Item> */}
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                ))}
+              </div>
+            )
+          })}
           {/* {watchlistsData?.map((watchlist, index) => (
             <div key={watchlist.title}>
               <Divider orientation="center">{_.upperFirst(watchlist.title)}</Divider>
@@ -606,8 +515,21 @@ const useCameraForm = ({ data, visible, setVisible }: Props = {}) => {
     }
   }
   return (
-    <Form onFinish={onFinish} form={form} layout="vertical">
-      <Tabs size="large" items={tabsItems.sort((a, b) => Number(a.key) - Number(b.key))} />
+    <Form
+      onFinish={onFinish}
+      form={form}
+      layout="vertical"
+      initialValues={{
+        barcode_binarizer: BARCODE_BINARIZER[BarcodeBinarizerEnum.LocalAvarage].value,
+        model: CAMERA_MODEL_SELECTS[DeviceModelEnum.Gateway].value,
+        // enhancement: ENHANCEMENT_SELECTS[0].value,
+        // access_type: ACCESS_TYPE_SELECTS[AccessTypeEnum.Undefined].value,
+        // descriptor_type: DESCRIPTOR_TYPE_SELECT[DescriptorTypeEnum.Barcode].value,
+        // alert_type: ALERT_SELECTS[AlertTypeEnum.None].value,
+        // grant_type: GRANT_SELECTS[GrantTypeEnum.Undefined].value,
+      }}
+    >
+      <Tabs items={tabsItems.sort((a, b) => Number(a.key) - Number(b.key))} />
       <Button fullWidth type="primary" htmlType="submit" size="large" loading={isAddDeviceLoading || updateLoading}>
         Submit
       </Button>
